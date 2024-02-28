@@ -113,3 +113,15 @@ void print_wp()
 	}
 	return;
 }
+
+WP* check_wp()
+{
+  WP* curr = head;
+  while (curr != NULL)
+  {
+    bool success;
+    if(expr(curr->expr, &success))
+      return curr;
+  }
+  return NULL;
+}

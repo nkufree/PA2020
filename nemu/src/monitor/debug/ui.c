@@ -107,7 +107,8 @@ static int cmd_p(char* args) {
 }
 
 static int cmd_w(char* args) {
-  new_wp(args);
+  WP* wp = new_wp(args);
+  printf("Watchpoint %d: %s\n", wp->NO, wp->expr);
   return 0;
 }
 
