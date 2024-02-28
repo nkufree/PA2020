@@ -93,7 +93,7 @@ void cpu_exec(uint64_t n) {
     WP* wp = check_wp();
     if(wp != NULL)
     {
-      printf("Stop at pc: %08x, Watchpoint %d: %s\n", cpu.pc, wp->NO, wp->expr);
+      printf("Stop at pc: 0x%08x, watchpoint %d: %s\n", cpu.pc, wp->NO, wp->expr);
       nemu_state.state = NEMU_STOP;
     }
 #endif
