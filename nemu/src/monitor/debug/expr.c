@@ -9,7 +9,7 @@ enum {
   TK_NOTYPE = 256, TK_EQ,
 
   /* TODO: Add more token types */
-	TK_AND, TK_NEQ,
+	TK_AND, TK_NEQ, TK_G, TK_L, 
   TK_HEXNUM, TK_NUM, TK_REG, 
 	TK_MINUS, // UNARY -
 	TK_DERE, // UNARY *
@@ -39,6 +39,8 @@ static struct rule {
   {"==", TK_EQ},        // equal
 	{"&&", TK_AND},
 	{"!=", TK_NEQ},
+  {">", TK_G},
+  {"<", TK_L},
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -197,6 +199,8 @@ int get_main_op_pos(int p, int q) {
 			case TK_EQ:
 			case TK_AND:
 			case TK_NEQ:
+      case TK_G:
+      case TK_L:
 				if(in_parentheses || op_priority > 3)
           break;
 				pos = i;
@@ -286,6 +290,10 @@ word_t eval(int p, int q) {
 			return val1 != val2;
 		case TK_AND:
 			return val1 && val2;
+    case TK_G:
+      return val1 > val2;
+    case TK_L:
+      return val1 < val2;
     default:
       Log("error expr");
       expr_valid = false;
