@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <memory/paddr.h>
+#include "monitor/monitor.h"
 
 void cpu_exec(uint64_t);
 int is_batch_mode();
@@ -34,8 +36,84 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
+	nemu_state.state = NEMU_QUIT;
   return -1;
 }
+
+static int cmd_si(char *args) {
+  if(args == NULL)
+  {
+    cpu_exec(1);
+    return 0;
+  }
+  int num;
+  sscanf(args, "%d", &num);
+  cpu_exec(num);
+  return 0;
+}
+
+static int cmd_info(char* args) {
+  if(args[0] == 'r')
+  {
+    isa_reg_display();
+  }
+  else if(args[0] == 'w')
+  {
+    TODO();
+  }
+  else
+  {
+    Log("Error args, please input 'info r' or 'info w'");
+    return -1;
+  }
+  return 0;
+}
+
+static int cmd_x(char* args) {
+  int num;
+  char input_expr[32*32] = {};
+  sscanf(args, "%d %s", &num, input_expr);
+  bool success;
+  paddr_t addr = expr(input_expr, &success);
+  if(!success)
+	{
+		Log("expr error");
+		return 0;
+	}
+  for(int i = 0; i < (num << 2); i+=4) 
+  {
+    printf("0x%08x ", addr + i);
+    word_t tmp = paddr_read(addr + i, 4);
+    uint8_t* addr_tmp = (uint8_t*)&tmp;
+    for(int j = 0; j < 4; j++)
+    {
+      printf("%02x ", *(addr_tmp + 3 - j));
+    }
+    printf("\n");
+  }
+  return 0;
+}
+
+static int cmd_p(char* args) {
+  bool success;
+  word_t res = expr(args, &success);
+	if(!success)
+	{
+		Log("expr error");
+		return 0;
+	}
+	printf("dec: %d, hex: 0x%x\n", res, res);
+	return 0;
+}
+
+static int cmd_w(char* args) {
+  TODO();
+}
+
+static int cmd_d(char* args) {
+  TODO();
+}
+
 
 static int cmd_help(char *args);
 
@@ -49,7 +127,12 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
-
+	{ "si", "Execute N instructions", cmd_si},
+  { "info", "Show value of regs or breakpoints", cmd_info},
+  { "x", "Scan memory", cmd_x},
+  { "p", "Calculate the value of expr", cmd_p},
+  { "w", "Set monitor point", cmd_w},
+  { "d", "Delete monitor point", cmd_d},
 };
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))

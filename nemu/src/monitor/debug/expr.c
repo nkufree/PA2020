@@ -4,13 +4,18 @@
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
-
+#include <memory/paddr.h>
 enum {
   TK_NOTYPE = 256, TK_EQ,
 
   /* TODO: Add more token types */
-
+	TK_AND, TK_NEQ,
+  TK_HEXNUM, TK_NUM, TK_REG, 
+	TK_MINUS, // UNARY -
+	TK_DERE, // UNARY *
 };
+
+bool expr_valid = true;
 
 static struct rule {
   char *regex;
@@ -21,9 +26,19 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    */
 
-  {" +", TK_NOTYPE},    // spaces
+  {"0x[0-9A-F]+", TK_HEXNUM},
+  {"[1-9][0-9]+|[0-9]", TK_NUM},
+  {"\\$[0-9a-zA-Z]+", TK_REG},
   {"\\+", '+'},         // plus
+  {"\\(", '('},
+  {"\\)", ')'},
+  {"\\*", '*'},
+  {"/", '/'},
+  {" +", TK_NOTYPE},    // spaces
+  {"-", '-'},
   {"==", TK_EQ},        // equal
+	{"&&", TK_AND},
+	{"!=", TK_NEQ},
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -79,9 +94,25 @@ static bool make_token(char *e) {
          * of tokens, some extra actions should be performed.
          */
 
-        switch (rules[i].token_type) {
-          default: TODO();
+        if(rules[i].token_type == TK_NOTYPE)
+					break;
+        if(substr_len > 31)
+        {
+          Log("token len: %d is too long", substr_len);
+          return false;
         }
+        tokens[nr_token].type = rules[i].token_type;
+        switch (rules[i].token_type) {
+          case TK_HEXNUM:
+          case TK_NUM:
+          case TK_REG:
+            strncpy(tokens[nr_token].str, substr_start, substr_len);
+            tokens[nr_token].str[substr_len] = '\0';
+            break;
+          default: 
+            break;
+        }
+        nr_token++;
 
         break;
       }
@@ -96,6 +127,172 @@ static bool make_token(char *e) {
   return true;
 }
 
+bool check_parentheses(int p, int q) {
+  int size = 0;
+  if(tokens[p].type != '(' || tokens[q].type != ')')
+    return false;
+  for(int i = p; i < q; i++)
+  {
+    if(tokens[i].type == '(') {
+      size++;
+    }
+    else if(tokens[i].type == ')') {
+      size--;
+      if(size < 0)
+      {
+        Log("error expr");
+        expr_valid = false;
+        return false;
+      }
+      else if(size == 0)
+        return false;
+    }
+  }
+  if(size != 1)
+  {
+    Log("error expr");
+    expr_valid = false;
+    return false;
+  }
+  return true;
+}
+
+int get_main_op_pos(int p, int q) {
+  int pos = -1;
+  int op_priority = -1;
+  bool in_parentheses = false;
+  for(int i = p; i < q + 1; i++)
+  {
+    switch(tokens[i].type)
+    {
+      case '(':
+        in_parentheses = true;
+        break;
+      case ')':
+        in_parentheses = false;
+        break;
+      case '+':
+      case '-':
+        if(in_parentheses)
+          break;
+				if(in_parentheses || op_priority > 2)
+          break;
+        pos = i;
+        op_priority = 2;
+        break;
+      case '*':
+      case '/':
+        if(in_parentheses || op_priority > 1)
+          break;
+        pos = i;
+        op_priority = 1;
+        break;
+			case TK_MINUS:
+			case TK_DERE:
+				if(in_parentheses || op_priority > 0)
+          break;
+				pos = i;
+        op_priority = 0;
+        break;
+			case TK_EQ:
+			case TK_AND:
+			case TK_NEQ:
+				if(in_parentheses || op_priority > 3)
+          break;
+				pos = i;
+        op_priority = 3;
+        break;
+      default:
+        break;
+    }
+  }
+  return pos;
+}
+
+word_t eval(int p, int q) {
+  if(!expr_valid)
+    return 0;
+  if (p > q) {
+    /* Bad expression */
+    Log("error eval");
+    expr_valid = false;
+    return 0;
+  }
+  else if (p == q) {
+    /* Single token.
+     * For now this token should be a number.
+     * Return the value of the number.
+     */
+    Assert(tokens[p].type == TK_HEXNUM || tokens[p].type == TK_NUM || tokens[p].type == TK_REG, 
+    "error type of token %d, type is %d", p, tokens[p].type);
+    word_t num;
+    switch(tokens[p].type) {
+      case TK_HEXNUM:
+        sscanf(tokens[p].str, "0x%x", &num);
+        break;
+      case TK_NUM:
+        sscanf(tokens[p].str, "%d", &num);
+        break;
+      case TK_REG:
+        {
+          bool success;
+          num = isa_reg_str2val(tokens[p].str, &success);
+          if(!success)
+          {
+            Log("error reg");
+            return 0;
+          }
+        }
+        break;
+      default:
+        break;
+    }
+    return num;
+  }
+  else if (check_parentheses(p, q) == true) {
+    /* The expression is surrounded by a matched pair of parentheses.
+     * If that is the case, just throw away the parentheses.
+     */
+    return eval(p + 1, q - 1);
+  }
+  else {
+    /* We should do more things here. */
+    if(!expr_valid)
+      return 0;
+    int op = get_main_op_pos(p, q);
+		word_t val1;
+		if(tokens[op].type == TK_MINUS || tokens[op].type == TK_DERE)
+			val1 = 0;
+		else
+    	val1 = eval(p, op - 1);
+    word_t val2 = eval(op + 1, q);
+    switch (tokens[op].type)
+    {
+    case '+':
+      return val1 + val2;
+    case '-':
+      return val1 - val2;
+    case '*':
+      return val1 * val2;
+    case '/':
+      return val1 / val2;
+		case TK_MINUS:
+			return -val2;
+		case TK_DERE:
+			return paddr_read(val2, 4);
+		case TK_EQ:
+			return val1 == val2;
+		case TK_NEQ:
+			return val1 != val2;
+		case TK_AND:
+			return val1 && val2;
+    default:
+      Log("error expr");
+      expr_valid = false;
+      return 0;
+    }
+  }
+}
 
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -104,7 +301,27 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-  TODO();
+  for(int i = 0; i < nr_token; i++)
+	{
+		int prev = i == 0 ? TK_NOTYPE : tokens[i - 1].type;
+		if(tokens[i].type == '-' || tokens[i].type == '*')
+		{
+			if(i == 0 || prev == '+' || prev == '-' 
+			|| prev == '*' || prev == '/' 
+			|| prev == '(' || prev == TK_MINUS || prev == TK_DERE)
+			{
+				if(tokens[i].type == '-')
+					tokens[i].type = TK_MINUS;
+				else if(tokens[i].type == '*')
+					tokens[i].type = TK_DERE;
+			}
+		}
+	}
 
-  return 0;
+  word_t res = eval(0, nr_token - 1);
+  if(!expr_valid)
+    *success = false;
+  *success = true;
+
+  return res;
 }
