@@ -31,7 +31,8 @@ WP* new_wp(char* expr)
 	{
 		curr = free_;
 		free_ = free_->next;
-		memcpy(curr->expr, expr, strlen(expr) + 1);
+        head = curr;
+		memcpy(head->expr, expr, strlen(expr) + 1);
 		return curr;
 	}
   while (curr->next != NULL)
