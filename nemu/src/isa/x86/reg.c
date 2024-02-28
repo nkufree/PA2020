@@ -45,7 +45,13 @@ void reg_test() {
 void isa_reg_display() {
   for(int i = 0; i < 8; i++)
   {
-    printf("%s = 0x%08x\n", regsl[i], cpu.gpr[i]._32);
+    printf("%s = 0x%08x\t", regsl[i], cpu.gpr[i]._32);
+    printf("%s = 0x%04x\t", regsw[i], cpu.gpr[i]._16);
+    if(i < 4)
+    {
+      printf("%s = 0x%02x\t", regsb[i], cpu.gpr[i]._8[0]);
+      printf("%s = 0x%02x\n", regsb[i + 4], cpu.gpr[i]._8[1]);
+    }
   }
   printf("pc = 0x%08x\n", cpu.pc);
 }
@@ -80,7 +86,7 @@ word_t isa_reg_str2val(const char *s, bool *success) {
 		if(strcmp(regsb[i], s + shift) == 0)
 		{
 			*success = true;
-			return cpu.gpr[i % 4]._8[i / 2];
+			return cpu.gpr[i % 4]._8[i / 4];
 		}
 	}
 	*success = false;
