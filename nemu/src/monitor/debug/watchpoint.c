@@ -42,6 +42,7 @@ WP* new_wp(char* expr)
 	}
 	curr->next = free_;
 	free_ = free_->next;
+    curr->next->next = NULL;
 	memcpy(curr->next->expr, expr, strlen(expr) + 1);
 	return curr->next;
 }
