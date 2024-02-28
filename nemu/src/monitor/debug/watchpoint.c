@@ -122,6 +122,7 @@ WP* check_wp()
     bool success;
     if(expr(curr->expr, &success))
       return curr;
+    curr = curr->next;
   }
   return NULL;
 }
