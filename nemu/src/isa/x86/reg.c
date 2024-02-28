@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "local-include/reg.h"
+#include <stdio.h>
 
 const char *regsl[] = {"eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"};
 const char *regsw[] = {"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"};
@@ -42,9 +43,46 @@ void reg_test() {
 }
 
 void isa_reg_display() {
-  
+  for(int i = 0; i < 8; i++)
+  {
+    printf("%s = 0x%08x\n", regsl[i], cpu.gpr[i]._32);
+  }
+  printf("pc = 0x%x\n", cpu.pc);
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
+  int shift = 0;
+	if(s[0] == '$')
+		shift = 1;
+  if(strcmp(s + shift, "pc") == 0)
+	{
+		*success = true;
+		return cpu.pc;
+	}
+  for(int i = 1; i < 8; i++)
+	{
+		if(strcmp(regsl[i], s + shift) == 0)
+		{
+			*success = true;
+			return cpu.gpr[i]._32;
+		}
+	}
+  for(int i = 1; i < 8; i++)
+	{
+		if(strcmp(regsw[i], s + shift) == 0)
+		{
+			*success = true;
+			return cpu.gpr[i]._16;
+		}
+	}
+  for(int i = 1; i < 8; i++)
+	{
+		if(strcmp(regsb[i], s + shift) == 0)
+		{
+			*success = true;
+			return cpu.gpr[i % 4]._8[i / 2];
+		}
+	}
+	*success = false;
   return 0;
 }
