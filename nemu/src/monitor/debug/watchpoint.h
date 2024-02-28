@@ -11,5 +11,8 @@ typedef struct watchpoint {
   char expr[32*32];
 } WP;
 
+WP* new_wp(char* expr);
+void free_wp(int no);
+void print_wp();
 
 #endif

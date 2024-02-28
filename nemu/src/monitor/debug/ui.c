@@ -59,7 +59,7 @@ static int cmd_info(char* args) {
   }
   else if(args[0] == 'w')
   {
-    TODO();
+    print_wp();
   }
   else
   {
@@ -107,11 +107,15 @@ static int cmd_p(char* args) {
 }
 
 static int cmd_w(char* args) {
-  TODO();
+  new_wp(args);
+  return 0;
 }
 
 static int cmd_d(char* args) {
-  TODO();
+  int no;
+  sscanf(args, "%d", &no);
+  free_wp(no);
+  return 0;
 }
 
 
