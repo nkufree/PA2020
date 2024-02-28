@@ -26,7 +26,7 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    */
 
-  {"0x[0-9A-F]+", TK_HEXNUM},
+  {"0x[0-9A-Fa-f]+", TK_HEXNUM},
   {"[1-9][0-9]+|[0-9]", TK_NUM},
   {"\\$[0-9a-zA-Z]+", TK_REG},
   {"\\+", '+'},         // plus
