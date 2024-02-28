@@ -106,7 +106,7 @@ void print_wp()
 	WP* curr = head;
 	while (curr != NULL)
 	{
-		printf("%d 0x%s\n", curr->NO, curr->expr);
+		printf("%d %s\n", curr->NO, curr->expr);
 		curr = curr->next;
 	}
 	return;
