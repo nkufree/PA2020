@@ -191,7 +191,8 @@ int get_main_op_pos(int p, int q) {
         break;
 			case TK_MINUS:
 			case TK_DERE:
-				if(in_parentheses || op_priority > 0)
+        // 单目运算符取第一个进行划分
+				if(in_parentheses || op_priority >= 0)
           break;
 				pos = i;
         op_priority = 0;
