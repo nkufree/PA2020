@@ -69,7 +69,7 @@ word_t isa_reg_str2val(const char *s, bool *success) {
 		*success = true;
 		return cpu.pc;
 	}
-  for(int i = 1; i < 8; i++)
+  for(int i = 0; i < 8; i++)
 	{
 		if(strcmp(regsl[i], s + shift) == 0)
 		{
@@ -77,7 +77,7 @@ word_t isa_reg_str2val(const char *s, bool *success) {
 			return cpu.gpr[i]._32;
 		}
 	}
-  for(int i = 1; i < 8; i++)
+  for(int i = 0; i < 8; i++)
 	{
 		if(strcmp(regsw[i], s + shift) == 0)
 		{
@@ -85,7 +85,7 @@ word_t isa_reg_str2val(const char *s, bool *success) {
 			return cpu.gpr[i]._16;
 		}
 	}
-  for(int i = 1; i < 8; i++)
+  for(int i = 0; i < 8; i++)
 	{
 		if(strcmp(regsb[i], s + shift) == 0)
 		{
