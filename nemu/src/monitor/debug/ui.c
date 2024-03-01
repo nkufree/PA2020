@@ -102,7 +102,8 @@ static int cmd_p(char* args) {
 		Log("expr error");
 		return 0;
 	}
-	printf("dec: %d, hex: 0x%x\n", res, res);
+    else
+	    printf("dec: %d, hex: 0x%x\n", res, res);
 	return 0;
 }
 
