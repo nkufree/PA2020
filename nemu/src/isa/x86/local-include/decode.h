@@ -54,7 +54,12 @@ static inline def_DopHelper(SI) {
    *
    operand_imm(s, op, load_val, ???, op->width);
    */
-  TODO();
+  sword_t imm = instr_fetch(&s->seq_pc, op->width);
+  if(op->width == 1)
+  {
+    imm = (int8_t)imm;
+  }
+  operand_imm(s, op, load_val, imm, op->width);
 }
 
 /* I386 manual does not contain this abbreviation.
@@ -303,8 +308,8 @@ static inline def_DHelper(push_r) {
   }
 }
 
-static inline def_DHelper(call_Ap) {
-  
+static inline def_DHelper(call_SI) {
+  decode_J(s);
 }
 
 static inline void operand_write(DecodeExecState *s, Operand *op, rtlreg_t* src) {
