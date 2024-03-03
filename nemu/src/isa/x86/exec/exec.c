@@ -79,6 +79,7 @@ again:
   s->opcode = opcode;
   switch (opcode) {
     EX   (0x0f, 2byte_esc)
+    IDEX (0x31, xor_E2G, xor)
     IDEX (0x55, push_r, push)
     IDEX (0x68, push_SI, push)
     IDEXW(0x80, I2E, gp1, 1)
