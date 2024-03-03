@@ -34,7 +34,7 @@ static inline def_rtl(push, const rtlreg_t* src1) {
 static inline def_rtl(pop, rtlreg_t* dest) {
   // dest <- M[esp]
   // esp <- esp + 4
-  rtl_host_lm(s, dest, &reg_l(R_ESP), 4);
+  rtl_lm(s, dest, &reg_l(R_ESP), 0, 4);
   reg_l(R_ESP) += 4;
 }
 
