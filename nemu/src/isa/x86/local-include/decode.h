@@ -291,6 +291,18 @@ static inline def_DHelper(out_a2dx) {
   operand_reg(s, id_dest, true, R_DX, 2);
 }
 
+static inline def_DHelper(push_r) {
+  switch (s->opcode)
+  {
+  case 0x55:
+    operand_reg(s, id_src1, true, R_EBP, 4);
+    break;
+  
+  default:
+    break;
+  }
+}
+
 static inline def_DHelper(call_Ap) {
   
 }
