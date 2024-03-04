@@ -13,7 +13,7 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
       ret = false;
     }
   }
-  if(pc != cpu.pc)
+  if(ref_r->pc != cpu.pc)
   {
     printf("[pc error]  pc expect: 0x%08x, but: 0x%08x\n", ref_r->pc, cpu.pc);
       ret = false;
