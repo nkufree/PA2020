@@ -9,7 +9,7 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   {
     if(ref_r->gpr[i]._32 != cpu.gpr[i]._32)
     {
-      printf("[reg error]  reg %s exspect: %08x, but %08x", reg_name(i, 4), ref_r->gpr[i]._32, cpu.gpr[i]._32);
+      printf("[reg error]  reg %s exspect: 0x%08x, but: 0x%08x\n", reg_name(i, 4), ref_r->gpr[i]._32, cpu.gpr[i]._32);
     }
     ret = false;
   }
