@@ -82,7 +82,7 @@ static inline def_EHelper(gp5) {
     GPEXEC(0, inc)
     GPEXEC(1, dec)
     case 2:
-      exec_call(s);
+      exec_call_rm(s);
       break;
     case 3:
       exec_call_rm(s);
