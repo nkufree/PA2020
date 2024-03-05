@@ -47,8 +47,7 @@ static inline def_rtl(is_sub_overflow, rtlreg_t* dest,
     *dest = 0;
   else 
   {
-    rtl_sub(s, t0, src1, src2);
-  	if(sign(*t0, width) != sign(*src1, width))
+  	if(sign(*res, width) != sign(*src1, width))
       *dest = 1;
   	else
       *dest = 0;
@@ -68,8 +67,7 @@ static inline def_rtl(is_add_overflow, rtlreg_t* dest,
     *dest = 0;
   else 
   {
-    rtl_add(s, t0, src1, src2);
-  	if(sign(*t0, width) != sign(*src1, width)) 
+  	if(sign(*res, width) != sign(*src1, width)) 
       *dest = 1;
   	else 
       *dest = 0;
