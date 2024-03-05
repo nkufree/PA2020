@@ -33,6 +33,7 @@ static inline def_EHelper(cmp) {
 static inline def_EHelper(inc) {
   *s0 = 1;
   rtl_add(s, ddest, ddest, s0);
+  operand_write(s, id_dest, ddest);
   rtl_update_ZFSF(s, ddest, id_dest->width);
   rtl_is_add_carry(s, s1, ddest, s0);
   rtl_set_CF(s, s1);
@@ -44,6 +45,7 @@ static inline def_EHelper(inc) {
 static inline def_EHelper(dec) {
   *s0 = 1;
   rtl_sub(s, ddest, ddest, s0);
+  operand_write(s, id_dest, ddest);
   rtl_update_ZFSF(s, ddest, id_dest->width);
   rtl_is_sub_carry(s, s1, ddest, s0);
   rtl_set_CF(s, s1);
