@@ -312,8 +312,8 @@ static inline def_DHelper(leave) {
   }
   else if(id_dest->width == 4)
   {
-    operand_reg(s, id_src1, true, R_EBP, 2);
-    operand_reg(s, id_dest, false, R_ESP, 2);
+    operand_reg(s, id_src1, true, R_EBP, 4);
+    operand_reg(s, id_dest, false, R_ESP, 4);
   }
   else
     assert(0);
