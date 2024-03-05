@@ -3,6 +3,7 @@
 static inline def_EHelper(add) {
   *s0 = *ddest;
   rtl_add(s, ddest, ddest, dsrc1);
+  operand_write(s, id_dest, ddest);
   rtl_is_add_overflow(s, s1, ddest, s0, dsrc1, s->width);
   rtl_set_OF(s, s1);
   rtl_is_add_carry(s, s0, ddest, dsrc1);
@@ -14,6 +15,7 @@ static inline def_EHelper(add) {
 static inline def_EHelper(sub) {
   *s0 = *ddest;
   rtl_sub(s, ddest, ddest, dsrc1);
+  operand_write(s, id_dest, ddest);
   rtl_is_sub_overflow(s, s1, ddest, s0, dsrc1, id_dest->width);
   rtl_set_OF(s, s1);
   rtl_is_sub_carry(s, s0, ddest, dsrc1);
