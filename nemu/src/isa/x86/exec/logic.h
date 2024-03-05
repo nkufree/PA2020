@@ -1,7 +1,11 @@
 #include "cc.h"
 
 static inline def_EHelper(test) {
-  TODO();
+  rtl_and(s, s0, ddest, dsrc1);
+  *s1 = 0;
+  rtl_set_CF(s, s0);
+  rtl_set_OF(s, s0);
+  rtl_update_ZFSF(s, s0, id_dest->width);
   print_asm_template2(test);
 }
 

@@ -18,16 +18,28 @@ static inline def_EHelper(gp1) {
     case 0:
       exec_add(s);
       break;
-    EMPTY(1) EMPTY(2) EMPTY(3)
+    case 1:
+      exec_or(s);
+      break;
+    case 2:
+      exec_adc(s);
+      break;
+    case 3:
+      exec_sbb(s);
+      break;
     case 4:
       exec_and(s);
       break;
     case 5:
       exec_sub(s);
       break;
-    EMPTY(6)
+    case 6:
+      exec_xor(s);
+      break;
     case 7:
       exec_cmp(s);
+      break;
+    default:
       break;
   }
 }

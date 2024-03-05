@@ -4,6 +4,8 @@
 #include <rtl/rtl.h>
 #include "reg.h"
 
+#define sign(a, width) ((a >> (width * 8 - 1)) & 0x1)
+
 /* RTL pseudo instructions */
 
 static inline def_rtl(lr, rtlreg_t* dest, int r, int width) {
@@ -41,23 +43,16 @@ static inline def_rtl(pop, rtlreg_t* dest) {
 static inline def_rtl(is_sub_overflow, rtlreg_t* dest,
     const rtlreg_t* res, const rtlreg_t* src1, const rtlreg_t* src2, int width) {
   // dest <- is_overflow(src1 - src2)
-  bool is_overflow = false;
-  if((sword_t)*src1 > 0 && (sword_t)*src2 < 0)
-  {
-    *t0 = ((*src1 - *src2) << (width * 8)) >> (width * 8);
-    if((sword_t)*t0 <= (sword_t)*src1)
-      is_overflow = true;
-  }
-  else if((sword_t)*src1 < 0 && (sword_t)*src2 > 0)
-  {
-    *t0 = ((*src1 - *src2) << (width * 8)) >> (width * 8);
-    if((sword_t)*t0 > (sword_t)*src1)
-      is_overflow = true;
-  }
-  if(is_overflow)
-    *dest = 1;
-  else
+  if(sign(*src1, width) == sign(*src2, width))
     *dest = 0;
+  else 
+  {
+    rtl_sub(s, t0, src1, src2);
+  	if(sign(*t0, width) != sign(*src1, width))
+      *dest = 1;
+  	else
+      *dest = 0;
+  }
 }
 
 static inline def_rtl(is_sub_carry, rtlreg_t* dest,
@@ -69,33 +64,22 @@ static inline def_rtl(is_sub_carry, rtlreg_t* dest,
 static inline def_rtl(is_add_overflow, rtlreg_t* dest,
     const rtlreg_t* res, const rtlreg_t* src1, const rtlreg_t* src2, int width) {
   // dest <- is_overflow(src1 + src2)
-  bool is_overflow = false;
-  if((sword_t)*src1 > 0 && (sword_t)*src2 > 0)
-  {
-    *t0 = *src1 + *src2;
-    if(((sword_t)*t0 & (1 << (width * 8 - 1))) != 0)
-      is_overflow = true;
-  }
-  else if((sword_t)*src1 < 0 && (sword_t)*src2 < 0)
-  {
-    *t0 = ((*src1 + *src2) << (width * 8)) >> (width * 8);
-    if((sword_t)*t0 >= (sword_t)*src1 || (sword_t)*t0 >= (sword_t)*src2)
-      is_overflow = true;
-  }
-  if(is_overflow)
-    *dest = 1;
-  else
+  if(sign(*src1, width) != sign(*src2, width)) 
     *dest = 0;
+  else 
+  {
+    rtl_add(s, t0, src1, src2);
+  	if(sign(*t0, width) != sign(*src1, width)) 
+      *dest = 1;
+  	else 
+      *dest = 0;
+  }
 }
 
 static inline def_rtl(is_add_carry, rtlreg_t* dest,
     const rtlreg_t* res, const rtlreg_t* src1) {
   // dest <- is_carry(src1 + src2)
-  *t0 = *res + *src1;
-  if(*t0 <  *res || *t0 < *src1)
-    *dest = 1;
-  else
-    *dest = 0;
+  *dest = *res < *src1;
 }
 
 #define def_rtl_setget_eflags(f) \
