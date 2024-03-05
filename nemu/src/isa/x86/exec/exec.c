@@ -81,13 +81,10 @@ static inline def_EHelper(gp5) {
   switch (s->isa.ext_opcode) {
     GPEXEC(0, inc)
     GPEXEC(1, dec)
-    case 2:
-      exec_call_rm(s);
-      break;
-    case 3:
-      exec_call_rm(s);
-      break;
-    EMPTY(4) EMPTY(5)
+    GPEXEC(2, call_rm)
+    GPEXEC(3, call)
+    GPEXEC(4, jmp_rm)
+    GPEXEC(5, jmp)
     GPEXEC(6, push)
     EMPTY(7)
   }
