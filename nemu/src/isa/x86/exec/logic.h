@@ -7,21 +7,30 @@ static inline def_EHelper(test) {
 
 static inline def_EHelper(and) {
   rtl_and(s, ddest, ddest, dsrc1);
+  rtl_set_CF(s, 0);
+  rtl_set_OF(s, 0);
+  rtl_update_ZFSF(s, s0, id_dest->width);
   print_asm_template2(and);
 }
 
 static inline def_EHelper(xor) {
   rtl_xor(s, ddest, ddest, dsrc1);
+  rtl_set_CF(s, 0);
+  rtl_set_OF(s, 0);
+  rtl_update_ZFSF(s, s0, id_dest->width);
   print_asm_template2(xor);
 }
 
 static inline def_EHelper(or) {
   rtl_or(s, ddest, ddest, dsrc1);
+  rtl_set_CF(s, 0);
+  rtl_set_OF(s, 0);
+  rtl_update_ZFSF(s, s0, id_dest->width);
   print_asm_template2(or);
 }
 
 static inline def_EHelper(not) {
-  TODO();
+  rtl_not(s, ddest, ddest);
   print_asm_template1(not);
 }
 
