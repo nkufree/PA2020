@@ -34,7 +34,7 @@ static inline def_rtl(sext, rtlreg_t* dest, const rtlreg_t* src1, int width) {
   }
   else
   {
-    *dest = ((~0) << (width * 8)) | *src1;
+    *dest = (0xffffffffu << (width * 8)) | *src1;
   }
 }
 
