@@ -77,6 +77,22 @@ static inline def_EHelper(2byte_esc) {
   switch (opcode) {
   /* TODO: Add more instructions!!! */
     IDEX (0x01, gp7_E, gp7)
+    IDEXW(0x90, E, setcc, 1)
+    IDEXW(0x91, E, setcc, 1)
+    IDEXW(0x92, E, setcc, 1)
+    IDEXW(0x93, E, setcc, 1)
+    IDEXW(0x94, E, setcc, 1)
+    IDEXW(0x95, E, setcc, 1)
+    IDEXW(0x96, E, setcc, 1)
+    IDEXW(0x97, E, setcc, 1)
+    IDEX (0x98, E, setcc)
+    IDEX (0x99, E, setcc)
+    IDEX (0x9a, E, setcc)
+    IDEX (0x9b, E, setcc)
+    IDEX (0x9c, E, setcc)
+    IDEX (0x9d, E, setcc)
+    IDEX (0x9e, E, setcc)
+    IDEX (0x9f, E, setcc)
     default: exec_inv(s);
   }
 }
