@@ -299,15 +299,66 @@ static inline def_DHelper(out_a2dx) {
 static inline def_DHelper(push_r) {
   switch (s->opcode)
   {
+  case 0x50:
+    operand_reg(s, id_dest, true, R_EAX, 4);
+    break;
+  case 0x51:
+    operand_reg(s, id_dest, true, R_ECX, 4);
+    break;
+  case 0x52:
+    operand_reg(s, id_dest, true, R_EDX, 4);
+    break;
+  case 0x53:
+    operand_reg(s, id_dest, true, R_EBX, 4);
+    break;
+  case 0x54:
+    operand_reg(s, id_dest, true, R_ESP, 4);
+    break;
   case 0x55:
     operand_reg(s, id_dest, true, R_EBP, 4);
     break;
-  
-  default:
+  case 0x56:
+    operand_reg(s, id_dest, true, R_ESI, 4);
     break;
+  case 0x57:
+    operand_reg(s, id_dest, true, R_EDI, 4);
+    break;
+  default:
+    assert(0);
   }
 }
 
+static inline def_DHelper(pop_r) {
+  switch (s->opcode)
+  {
+  case 0x58:
+    operand_reg(s, id_dest, true, R_EAX, 4);
+    break;
+  case 0x59:
+    operand_reg(s, id_dest, true, R_ECX, 4);
+    break;
+  case 0x5A:
+    operand_reg(s, id_dest, true, R_EDX, 4);
+    break;
+  case 0x5B:
+    operand_reg(s, id_dest, true, R_EBX, 4);
+    break;
+  case 0x5C:
+    operand_reg(s, id_dest, true, R_ESP, 4);
+    break;
+  case 0x5D:
+    operand_reg(s, id_dest, true, R_EBP, 4);
+    break;
+  case 0x5E:
+    operand_reg(s, id_dest, true, R_ESI, 4);
+    break;
+  case 0x5F:
+    operand_reg(s, id_dest, true, R_EDI, 4);
+    break;
+  default:
+    assert(0);
+  }
+}
 static inline def_DHelper(call_SI) {
   decode_J(s);
 }
