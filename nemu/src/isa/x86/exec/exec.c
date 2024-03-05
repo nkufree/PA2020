@@ -84,8 +84,9 @@ again:
   opcode = instr_fetch(&s->seq_pc, 1);
   s->opcode = opcode;
   switch (opcode) {
+    IDEX (0x01, G2E, add)
     EX   (0x0f, 2byte_esc)
-    IDEX (0x31, xor_E2G, xor)
+    IDEX (0x31, G2E, xor)
     IDEX (0x51, push_r, push)
     IDEX (0x52, push_r, push)
     IDEX (0x53, push_r, push)
