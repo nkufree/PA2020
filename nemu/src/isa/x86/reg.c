@@ -61,7 +61,7 @@ void isa_reg_display() {
   }
   for(int i = 0; i < 5; i++)
   {
-    printf("%s = %d ", eflagsn[i], eflagsi[i]);
+    printf("%s = %d ", eflagsn[i], get_flag(eflagsi[i]));
   }
   printf("\n");
   printf("pc = 0x%08x\n", cpu.pc);
