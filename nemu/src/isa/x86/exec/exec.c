@@ -75,7 +75,13 @@ static inline def_EHelper(gp3) {
       exec_not(s);
       break;
     EMPTY(3)
-    EMPTY(4) EMPTY(5) EMPTY(6) EMPTY(7)
+    EMPTY(4) EMPTY(5)
+    case 6:
+      exec_div(s);
+      break;
+    case 7:
+      exec_idiv(s);
+      break;
   }
 }
 
