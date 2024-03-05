@@ -30,15 +30,34 @@ static inline void rtl_setcc(DecodeExecState *s, rtlreg_t* dest, uint32_t subcod
   // dest <- ( cc is satisfied ? 1 : 0)
   switch (subcode & 0xe) {
     case CC_O:
+      rtl_get_OF(s, dest);
+      break;
     case CC_B:
+      rtl_get_CF(s, dest);
+      break;
     case CC_E:
       rtl_get_ZF(s, dest);
       break;
     case CC_BE:
+      rtl_get_CF(s, dest);
+      if(*dest == 0)
+        rtl_get_ZF(s, dest);
+      break;
     case CC_S:
+      rtl_get_SF(s, dest);
+      break;
     case CC_L:
+      rtl_get_SF(s, dest);
+      rtl_get_OF(s, t0);
+      *dest = *dest != *t0;
+      break;
     case CC_LE:
-       TODO();
+      rtl_get_SF(s, dest);
+      rtl_get_OF(s, t0);
+      *dest = *dest != *t0;
+      rtl_get_ZF(s, t0);
+      *dest |= *t0;
+      break;
     case CC_P: panic("PF is not supported");
     default: panic("should not reach here");
   }
