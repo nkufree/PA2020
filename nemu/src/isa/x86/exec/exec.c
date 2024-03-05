@@ -50,6 +50,10 @@ static inline def_EHelper(gp2) {
 static inline def_EHelper(gp3) {
   switch (s->isa.ext_opcode) {
     // GPEXEC(0, test)
+    case 0:
+      decode_op_I(s, id_src1, true);
+      exec_test(s);
+      break;
     EMPTY(1)
     GPEXEC(2, not)
     GPEXEC(3, neg)
