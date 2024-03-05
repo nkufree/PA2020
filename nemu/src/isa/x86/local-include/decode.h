@@ -305,12 +305,12 @@ static inline def_DHelper(none) {
 }
 
 static inline def_DHelper(leave) {
-  if(s->width == 2)
+  if(id_dest->width == 2)
   {
     operand_reg(s, id_src1, true, R_BP, 2);
     operand_reg(s, id_dest, false, R_SP, 2);
   }
-  else if(s->width == 4)
+  else if(id_dest->width == 4)
   {
     operand_reg(s, id_src1, true, R_EBP, 2);
     operand_reg(s, id_dest, false, R_ESP, 2);
