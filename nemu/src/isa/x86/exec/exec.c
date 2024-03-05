@@ -49,7 +49,8 @@ static inline def_EHelper(gp2) {
 /* 0xf6, 0xf7 */
 static inline def_EHelper(gp3) {
   switch (s->isa.ext_opcode) {
-    EMPTY(0) EMPTY(1)
+    GPEXEC(0, test)
+    EMPTY(1)
     GPEXEC(2, not)
     GPEXEC(3, neg)
     GPEXEC(4, mul)
