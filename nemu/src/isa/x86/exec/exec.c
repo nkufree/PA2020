@@ -17,27 +17,13 @@ static inline def_EHelper(none){}
 static inline def_EHelper(gp1) {
   switch (s->isa.ext_opcode) {
     GPEXEC(0, add)
-    case 1:
-      exec_or(s);
-      break;
-    case 2:
-      exec_adc(s);
-      break;
-    case 3:
-      exec_sbb(s);
-      break;
-    case 4:
-      exec_and(s);
-      break;
-    case 5:
-      exec_sub(s);
-      break;
-    case 6:
-      exec_xor(s);
-      break;
-    case 7:
-      exec_cmp(s);
-      break;
+    GPEXEC(1, or)
+    GPEXEC(2, adc)
+    GPEXEC(3, sbb)
+    GPEXEC(4, and)
+    GPEXEC(5, sub)
+    GPEXEC(6, xor)
+    GPEXEC(7, cmp)
     default:
       break;
   }
@@ -51,16 +37,10 @@ static inline def_EHelper(gp2) {
     //   break;
     EMPTY(0)
     EMPTY(1) EMPTY(2) EMPTY(3)
-    case 4:
-      exec_shl(s);
-      break;
-    case 5:
-      exec_shr(s);
-      break;
+    GPEXEC(4, shl)
+    GPEXEC(5, shr)
     EMPTY(6)
-    case 7:
-      exec_sar(s);
-      break;
+    GPEXEC(7, sar)
     default:
       break;
   }
@@ -70,23 +50,13 @@ static inline def_EHelper(gp2) {
 static inline def_EHelper(gp3) {
   switch (s->isa.ext_opcode) {
     EMPTY(0) EMPTY(1)
-    case 2:
-      exec_not(s);
-      break;
-    case 3:
-      exec_neg(s);
-      break;
-    case 4:
-      exec_mul(s);
-      break;
-    case 5:
-      exec_imul1(s);
-      break;
-    case 6:
-      exec_div(s);
-      break;
-    case 7:
-      exec_idiv(s);
+    GPEXEC(2, not)
+    GPEXEC(3, neg)
+    GPEXEC(4, mul)
+    GPEXEC(5, imul1)
+    GPEXEC(6, div)
+    GPEXEC(7, idiv)
+    default:
       break;
   }
 }
@@ -94,12 +64,8 @@ static inline def_EHelper(gp3) {
 /* 0xfe */
 static inline def_EHelper(gp4) {
   switch (s->isa.ext_opcode) {
-    case 0:
-      exec_inc(s);
-      break;
-    case 1:
-      exec_dec(s);
-      break;
+    GPEXEC(0, inc)
+    GPEXEC(1, dec)
     EMPTY(2) EMPTY(3)
     EMPTY(4) EMPTY(5) EMPTY(6) EMPTY(7)
   }
@@ -108,17 +74,11 @@ static inline def_EHelper(gp4) {
 /* 0xff */
 static inline def_EHelper(gp5) {
   switch (s->isa.ext_opcode) {
-    case 0:
-      exec_inc(s);
-      break;
-    case 1:
-      exec_dec(s);
-      break;
+    GPEXEC(0, inc)
+    GPEXEC(1, dec)
     EMPTY(2) EMPTY(3)
     EMPTY(4) EMPTY(5)
-    case 6:
-      exec_push(s);
-      break;
+    GPEXEC(6, push)
     EMPTY(7)
   }
 }
