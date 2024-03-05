@@ -11,7 +11,8 @@ static inline def_EHelper(sub) {
 }
 
 static inline def_EHelper(cmp) {
-  TODO();
+  rtl_sub(s, s0, ddest, dsrc1);
+  
   print_asm_template2(cmp);
 }
 

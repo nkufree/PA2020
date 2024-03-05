@@ -296,26 +296,6 @@ static inline def_DHelper(out_a2dx) {
   operand_reg(s, id_dest, true, R_DX, 2);
 }
 
-static inline def_DHelper(inc_r) {
-  assert(s->opcode >= 0x40 && s->opcode <= 0x47);
-  operand_reg(s, id_dest, true, s->opcode & 0x0f, 4);
-}
-
-static inline def_DHelper(dec_r) {
-  assert(s->opcode >= 0x48 && s->opcode <= 0x4f);
-  operand_reg(s, id_dest, true, (s->opcode & 0x0f) - 0x8, 4);
-}
-
-static inline def_DHelper(push_r) {
-  assert(s->opcode >= 0x50 && s->opcode <= 0x57);
-  operand_reg(s, id_dest, true, s->opcode & 0x0f, 4);
-}
-
-static inline def_DHelper(pop_r) {
-  assert(s->opcode >= 0x58 && s->opcode <= 0x5f);
-  operand_reg(s, id_dest, true, (s->opcode & 0x0f) - 0x8, 4);
-}
-
 static inline def_DHelper(call_SI) {
   decode_J(s);
 }
