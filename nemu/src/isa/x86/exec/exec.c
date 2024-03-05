@@ -20,7 +20,10 @@ static inline def_EHelper(gp1) {
     case 5:
       exec_sub(s);
       break;
-    EMPTY(6) EMPTY(7)
+    EMPTY(6)
+    case 7:
+      exec_cmp(s);
+      break;
   }
 }
 
