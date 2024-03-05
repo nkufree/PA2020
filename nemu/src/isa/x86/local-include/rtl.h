@@ -100,7 +100,10 @@ static inline def_rtl(is_add_carry, rtlreg_t* dest,
 
 #define def_rtl_setget_eflags(f) \
   static inline def_rtl(concat(set_, f), const rtlreg_t* src) { \
-    set_flag(concat(F_, f), *src); \
+    if(*src == 0) \
+      clear_flag(concat(F_, f)); \
+    else \
+      set_flag(concat(F_, f)); \
   } \
   static inline def_rtl(concat(get_, f), rtlreg_t* dest) { \
     *dest = get_flag(concat(F_, f)); \
@@ -114,17 +117,17 @@ def_rtl_setget_eflags(SF)
 static inline def_rtl(update_ZF, const rtlreg_t* result, int width) {
   // eflags.ZF <- is_zero(result[width * 8 - 1 .. 0])
   if(((*result << ((sizeof(word_t) - width) << 3))) == 0)
-    set_flag(F_ZF, 1);
+    set_flag(F_ZF);
   else
-    set_flag(F_ZF, 0);
+    clear_flag(F_ZF);
 }
 
 static inline def_rtl(update_SF, const rtlreg_t* result, int width) {
   // eflags.SF <- is_sign(result[width * 8 - 1 .. 0])
   if((*result & (1 << ((width << 3) - 1))) == 0)
-    set_flag(F_SF, 0);
+    clear_flag(F_SF);
   else
-    set_flag(F_SF, 1);
+    set_flag(F_SF);
 }
 
 static inline def_rtl(update_ZFSF, const rtlreg_t* result, int width) {
