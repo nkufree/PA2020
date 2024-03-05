@@ -16,12 +16,14 @@ static inline def_EHelper(cmp) {
 }
 
 static inline def_EHelper(inc) {
-  TODO();
+  *s0 = 1;
+  rtl_add(s, ddest, ddest, s0);
   print_asm_template1(inc);
 }
 
 static inline def_EHelper(dec) {
-  TODO();
+  *s0 = 1;
+  rtl_sub(s, ddest, ddest, s0);
   print_asm_template1(dec);
 }
 
