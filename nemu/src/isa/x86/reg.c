@@ -7,6 +7,8 @@
 const char *regsl[] = {"eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"};
 const char *regsw[] = {"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"};
 const char *regsb[] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
+const char *eflagsn[] = {"CF", "ZF", "SF", "IF", "OF"};
+const int eflagsi[] = { F_CF, F_ZF, F_SF, F_IF, F_OF};
 
 void reg_test() {
   srand(time(0));
@@ -57,6 +59,11 @@ void isa_reg_display() {
       printf("\n");
     }
   }
+  for(int i = 0; i < 5; i++)
+  {
+    printf("%s = %d ", eflagsn[i], eflagsi[i]);
+  }
+  printf("\n");
   printf("pc = 0x%08x\n", cpu.pc);
 }
 
