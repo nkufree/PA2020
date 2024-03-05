@@ -42,23 +42,27 @@ static inline def_EHelper(not) {
 }
 
 static inline def_EHelper(sar) {
-  TODO();
+  rtl_sar(s, ddest, ddest, dsrc1);
   // unnecessary to update CF and OF in NEMU
   print_asm_template2(sar);
 }
 
 static inline def_EHelper(shl) {
-  TODO();
+  rtl_shl(s, ddest, ddest, dsrc1);
   // unnecessary to update CF and OF in NEMU
   print_asm_template2(shl);
 }
 
 static inline def_EHelper(shr) {
-  TODO();
+  rtl_shr(s, ddest, ddest, dsrc1);
   // unnecessary to update CF and OF in NEMU
   print_asm_template2(shr);
 }
 
+// static inline def_EHelper(rol) {
+//   rtl_
+//   print_asm_template2(rol);
+// }
 
 static inline def_EHelper(setcc) {
   uint32_t cc = s->opcode & 0xf;
