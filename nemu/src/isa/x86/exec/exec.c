@@ -1,6 +1,7 @@
 #include <cpu/exec.h>
 #include "../local-include/decode.h"
 #include "all-instr.h"
+#define GPEXEC(index, ex) case index: concat(exec_, ex)(s); break;
 
 static inline void set_width(DecodeExecState *s, int width) {
   if (width == -1) return;
@@ -15,9 +16,7 @@ static inline def_EHelper(none){}
 /* 0x80, 0x81, 0x83 */
 static inline def_EHelper(gp1) {
   switch (s->isa.ext_opcode) {
-    case 0:
-      exec_add(s);
-      break;
+    GPEXEC(0, add)
     case 1:
       exec_or(s);
       break;
@@ -74,8 +73,15 @@ static inline def_EHelper(gp3) {
     case 2:
       exec_not(s);
       break;
-    EMPTY(3)
-    EMPTY(4) EMPTY(5)
+    case 3:
+      exec_neg(s);
+      break;
+    case 4:
+      exec_mul(s);
+      break;
+    case 5:
+      exec_imul1(s);
+      break;
     case 6:
       exec_div(s);
       break;
