@@ -24,7 +24,8 @@ static inline def_EHelper(popa) {
 }
 
 static inline def_EHelper(leave) {
-  TODO();
+  operand_write(s, id_dest, dsrc1);
+  rtl_pop(s, dsrc1);
   print_asm("leave");
 }
 
