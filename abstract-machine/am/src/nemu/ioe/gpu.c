@@ -52,7 +52,7 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
       if(y+i < H&&x+j <W)
       {
         fb[W*(y+i)+x+j] = pixels[w*i+j];
-        printf("fb addr: %d", fb + W*(y+i)+x+j);
+        printf("fb addr: %d\n", fb + W*(y+i)+x+j);
         //printf("%x\n",fb[W*(y+i)+x+j]);
       }
     }
