@@ -31,8 +31,9 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
 }
 
 void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
-  uint32_t *tmp = (uint32_t *)(uintptr_t)FB_ADDR;
-  uint32_t (*fb)[W] = (uint32_t (*)[W])(uintptr_t)tmp;
+  // uint32_t *tmp = (uint32_t *)(uintptr_t)FB_ADDR;
+  // uint32_t (*fb)[W] = (uint32_t (*)[W])(uintptr_t)tmp;
+  uint32_t (*fb)[W] = (uint32_t (*)[W])(uintptr_t)FB_ADDR;
   uint32_t (*pixels)[W] = ctl->pixels;
   int rw = ctl->x + ctl->w > W ? W : ctl->x + ctl->w;
   int bh = ctl->y + ctl->h > H ? H : ctl->y + ctl->h;
