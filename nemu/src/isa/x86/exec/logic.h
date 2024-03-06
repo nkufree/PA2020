@@ -80,7 +80,7 @@ static inline def_EHelper(bsr) {
     rtl_set_ZF(s, dsrc1);
   }
   else{
-    printf("src: %08x\n", *dsrc1);
+    printf("src: %08x\n", cpu.ecx);
     uint32_t pos = (s->isa.is_operand_size_16 ? 16 : 32) - 1;
     *s1 = 1;
     rtl_set_ZF(s, s1);
