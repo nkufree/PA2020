@@ -80,15 +80,19 @@ static inline def_EHelper(bsr) {
     rtl_set_ZF(s, dsrc1);
   }
   else{
-    *s0 = (s->isa.is_operand_size_16?16:32) - 1;
+    uint32_t pos = (s->isa.is_operand_size_16 ? 16 : 32) - 1;
     *s1 = 1;
     rtl_set_ZF(s, s1);
-    while((*dsrc1 & (1<<*s0)) == 0 )
+    uint32_t loop = 0;
+    while((*dsrc1 & (1 << pos)) == 0 )
     {
-      rtl_subi(s,s0,s0,1);
-      *ddest = *s0;
+      pos -= 1;
+      loop++;
     }
+    *ddest = loop;
   }
+  operand_write(s, id_dest, ddest);
+  print_asm_template2(bsr);
 }
 
 static inline def_EHelper(setcc) {
