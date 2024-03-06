@@ -4,6 +4,7 @@
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 static unsigned long int next = 1;
+static char *addr = NULL;
 
 int rand(void) {
   // RAND_MAX assumed to be 32767
@@ -30,7 +31,16 @@ int atoi(const char* nptr) {
 }
 
 void *malloc(size_t size) {
-  return NULL;
+  if(addr == NULL)
+    addr = (void *)ROUNDUP(heap.start, 8);
+  char* ret = addr;
+  size = (size_t)ROUNDUP(size, 8);
+  addr=addr+size;
+  assert((uintptr_t)heap.start <= (uintptr_t)addr && (uintptr_t)addr < (uintptr_t)heap.end);
+  for (char *p = (char *)ret; p != (char *)addr; p ++) {
+    *p = 0;
+  }
+  return ret;
 }
 
 void free(void *ptr) {
