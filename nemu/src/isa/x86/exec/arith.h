@@ -3,6 +3,9 @@
 static inline def_EHelper(add) {
   *s0 = *ddest;
   rtl_add(s, ddest, ddest, dsrc1);
+  if (id_dest->width != 4) {
+    rtl_andi(s, ddest, ddest, 0xffffffffu >> ((4 - id_dest->width) * 8));
+  }
   operand_write(s, id_dest, ddest);
   rtl_is_add_overflow(s, s1, ddest, s0, dsrc1, s->width);
   rtl_set_OF(s, s1);
@@ -15,6 +18,9 @@ static inline def_EHelper(add) {
 static inline def_EHelper(sub) {
   *s0 = *ddest;
   rtl_sub(s, ddest, ddest, dsrc1);
+  if (id_dest->width != 4) {
+    rtl_andi(s, ddest, ddest, 0xffffffffu >> ((4 - id_dest->width) * 8));
+  }
   operand_write(s, id_dest, ddest);
   rtl_is_sub_overflow(s, s1, ddest, s0, dsrc1, id_dest->width);
   rtl_set_OF(s, s1);
@@ -26,6 +32,9 @@ static inline def_EHelper(sub) {
 
 static inline def_EHelper(cmp) {
   rtl_sub(s, s0, ddest, dsrc1);
+  if (id_dest->width != 4) {
+    rtl_andi(s, s0, s0, 0xffffffffu >> ((4 - id_dest->width) * 8));
+  }
   rtl_update_ZFSF(s, s0, id_dest->width);
   rtl_is_sub_overflow(s, s2, s0, ddest, dsrc1, id_dest->width);
   rtl_set_OF(s, s2);
@@ -38,12 +47,16 @@ static inline def_EHelper(inc) {
   *s0 = 1;
   *s1 = *ddest;
   rtl_add(s, ddest, ddest, s0);
-  operand_write(s, id_dest, ddest);
+  if (id_dest->width != 4) {
+    rtl_andi(s, ddest, ddest, 0xffffffffu >> ((4 - id_dest->width) * 8));
+  }
   rtl_is_add_overflow(s, s2, ddest, s1, s0, id_dest->width);
   rtl_set_OF(s, s2);
   rtl_update_ZFSF(s, ddest, id_dest->width);
   rtl_is_add_carry(s, s1, ddest, s0);
   rtl_set_CF(s, s1);
+  
+  operand_write(s, id_dest, ddest);
   print_asm_template1(inc);
 }
 
@@ -51,6 +64,9 @@ static inline def_EHelper(dec) {
   *s0 = 1;
   *s1 = *ddest;
   rtl_sub(s, ddest, ddest, s0);
+  if (id_dest->width != 4) {
+    rtl_andi(s, ddest, ddest, 0xffffffffu >> ((4 - id_dest->width) * 8));
+  }
   operand_write(s, id_dest, ddest);
   rtl_is_sub_overflow(s, s2, ddest, s1, s0, id_dest->width);
   rtl_set_OF(s, s2);
@@ -68,8 +84,16 @@ static inline def_EHelper(neg) {
     *s0 = 1;
     rtl_set_CF(s, s0);
   }
+  *s0 = 0;
+  rtl_sub(s, s1, s0, ddest);
+  rtl_update_ZFSF(s, s1, id_dest->width);
+  rtl_is_sub_overflow(s, s2, s1, s0, ddest, id_dest->width);
   rtl_neg(s, ddest, ddest);
-
+  if (id_dest->width != 4) {
+    rtl_andi(s, ddest, ddest, 0xffffffffu >> ((4 - id_dest->width) * 8));
+  }
+  operand_write(s, id_dest, ddest);
+  
   print_asm_template1(neg);
 }
 
