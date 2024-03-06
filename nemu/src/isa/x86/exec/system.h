@@ -45,11 +45,33 @@ static inline def_EHelper(iret) {
 }
 
 static inline def_EHelper(in) {
-  TODO();
+  switch(id_dest->width)
+	{
+		case 1:
+			*s0 = pio_read_b(id_src1->val);
+			break;
+		case 2:
+		  *s0 = pio_read_w(id_src1->val);
+			break;
+		case 4:
+			*s0 = pio_read_l(id_src1->val);
+			break;
+	}
+	operand_write(s, id_dest, s0);
   print_asm_template2(in);
 }
 
 static inline def_EHelper(out) {
-  TODO();
+  switch (id_src1->width){
+		case 1:
+			pio_write_b(id_dest->val, id_src1->val);
+			break;
+		case 2:
+			pio_write_w(id_dest->val, id_src1->val);
+			break;
+		case 4:
+			pio_write_l(id_dest->val, id_src1->val);
+			break;
+  }
   print_asm_template2(out);
 }
