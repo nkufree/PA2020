@@ -1,5 +1,6 @@
 #include <am.h>
 #include <nemu.h>
+#include <klib.h>
 
 #define SYNC_ADDR (VGACTL_ADDR + 4)
 #ifdef MODE_800x600
@@ -27,6 +28,7 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
     .width = inw(VGACTL_ADDR+2), .height = inw(VGACTL_ADDR),
     .vmemsz = 0
   };
+  printf("w: %d, h: %d\n", cfg->width, cfg->height);
 }
 
 void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
