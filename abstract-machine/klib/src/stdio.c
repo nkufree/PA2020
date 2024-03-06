@@ -49,11 +49,21 @@ int sprintf(char *out, const char *fmt, ...) {
             out_index++;
             break;
           }
+          int len = 0;
+          int dc = d;
+          while (dc != 0)
+          {
+              len++;
+              dc = dc / 10;
+          }
+          len += out_index - 1;
+          int tmp;
           while (d != 0)
           {
-            int tmp = d % 10;
+            tmp = d % 10;
             d = d / 10;
-            out[out_index] = tmp + '0';
+            out[len] = tmp + '0';
+            len--;
             out_index++;
           }
           break;
