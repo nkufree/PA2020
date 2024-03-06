@@ -3,13 +3,13 @@
 #include <klib.h>
 
 #define SYNC_ADDR (VGACTL_ADDR + 4)
-// #ifdef MODE_800x600
-# define W 800
-# define H 600
-// #else
-// # define W 400
-// # define H 300
-// #endif
+#ifdef MODE_800x600
+#define W 800
+#define H 600
+#else
+#define W 400
+#define H 300
+#endif
 
 void __am_gpu_init() {
   // int i;
