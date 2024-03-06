@@ -299,6 +299,7 @@ again:
     IDEX (0x8b, mov_E2G, mov)
     IDEX (0x8d, lea_M2G, lea)
     IDEX (0X90, none, none)
+    IDEX (0x98, none, cwtl)
     IDEX (0x99, none, cltd)
     IDEXW(0xa0, O2a, mov, 1)
     IDEX (0xa1, O2a, mov)
