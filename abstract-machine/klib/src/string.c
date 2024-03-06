@@ -84,7 +84,30 @@ void* memmove(void* dst,const void* src,size_t n) {
 }
 
 void* memcpy(void* out, const void* in, size_t n) {
-  return NULL;
+  if(in == NULL || out == NULL)
+    return NULL;
+  void* ret = out;
+  if(out < in || out > in + n) 
+  {
+    for(int i = 0; i < n; i++)
+    {
+      *(char*)out = *(char*)in;
+      out = (char*)out + 1;
+      in = (char*)in + 1;
+    }
+  }
+  else
+  {
+    out = (char*)out + n;
+    in = (char*)in + n;
+    for(int i = 0; i < n; i++)
+    {
+      *(char*)out = *(char*)in;
+      out = (char*)out - 1;
+      in = (char*)in - 1;
+    }
+  }
+  return ret;
 }
 
 int memcmp(const void* s1, const void* s2, size_t n) {
