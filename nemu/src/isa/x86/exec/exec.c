@@ -51,7 +51,7 @@ static inline def_EHelper(gp3) {
   switch (s->isa.ext_opcode) {
     // GPEXEC(0, test)
     case 0:
-      decode_op_I(s, id_src1, true);
+      decode_test_I(s);
       exec_test(s);
       break;
     EMPTY(1)
@@ -232,6 +232,8 @@ again:
     IDEX (0x5d, r, pop)
     IDEX (0x5e, r, pop)
     IDEX (0x5f, r, pop)
+    IDEX (0x60, none, pusha)
+    IDEX (0x61, none, popa)
     IDEXW(0x6a, push_SI, push, 1)
     IDEX (0x68, push_SI, push)
     IDEXW(0x70, J, jcc, 1)

@@ -14,12 +14,31 @@ static inline def_EHelper(pop) {
 }
 
 static inline def_EHelper(pusha) {
-  TODO();
+  assert(id_dest->width == 4);
+  // TODO: width = 2
+  *s0 = reg_l(R_ESP);
+  rtl_push(s, &reg_l(R_EAX));
+  rtl_push(s, &reg_l(R_ECX));
+  rtl_push(s, &reg_l(R_EDX));
+  rtl_push(s, &reg_l(R_EBX));
+  rtl_push(s, s0);
+  rtl_push(s, &reg_l(R_EBP));
+  rtl_push(s, &reg_l(R_ESI));
+  rtl_push(s, &reg_l(R_EDI));
   print_asm("pusha");
 }
 
 static inline def_EHelper(popa) {
-  TODO();
+  assert(id_dest->width == 4);
+  // TODO: width = 2
+  rtl_pop(s, &reg_l(R_EDI));
+  rtl_pop(s, &reg_l(R_ESI));
+  rtl_pop(s, &reg_l(R_EBP));
+  rtl_pop(s, s0);
+  rtl_pop(s, &reg_l(R_EBX));
+  rtl_pop(s, &reg_l(R_EDX));
+  rtl_pop(s, &reg_l(R_ECX));
+  rtl_pop(s, &reg_l(R_EAX));
   print_asm("popa");
 }
 
