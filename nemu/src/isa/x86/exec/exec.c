@@ -32,11 +32,42 @@ static inline def_EHelper(gp1) {
 /* 0xc0, 0xc1, 0xd0, 0xd1, 0xd2, 0xd3 */
 static inline def_EHelper(gp2) {
   switch (s->isa.ext_opcode) {
-    // case 0:
-    //   exec_rol(s);
-    //   break;
-    EMPTY(0)
-    EMPTY(1) EMPTY(2) EMPTY(3)
+    case 0:
+      //rtl_andi(s,s0,dsrc1,0xff);
+      rtl_mv(s,s0,dsrc1);
+      while(*s0 != 0)
+      {
+        if(s->isa.is_operand_size_16)
+        {
+          rtl_msb(s,s1,ddest,2);
+          *ddest = *ddest * 2 +*s1;
+          rtl_andi(s,ddest,ddest,0xffff);
+        }
+        else{
+          rtl_msb(s,s1,ddest,4);
+          *ddest = *ddest * 2 +*s1;
+        }
+        rtl_subi(s,s0,s0,1);
+      }
+      break;//rol
+    case 1:
+      rtl_mv(s,s0,dsrc1);
+      while(*s0 != 0)
+      {
+        if(s->isa.is_operand_size_16)
+        {
+          rtl_andi(s,s1,ddest,1);
+          *ddest = *ddest / 2 +((*s1)<<15);
+          rtl_andi(s,ddest,ddest,0xffff);
+        }
+        else{
+          rtl_andi(s,s1,ddest,1);
+          *ddest = *ddest / 2 +(*s1 << 31);
+        }
+        rtl_subi(s,s0,s0,1);
+      }
+      break;//ror
+    EMPTY(2) EMPTY(3)
     GPEXEC(4, shl)
     GPEXEC(5, shr)
     EMPTY(6)
