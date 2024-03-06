@@ -61,7 +61,15 @@ static inline def_EHelper(dec) {
 }
 
 static inline def_EHelper(neg) {
-  TODO();
+  if(*ddest == 0)
+    rtl_set_CF(s, ddest);
+  else
+  {
+    *s0 = 1;
+    rtl_set_CF(s, s0);
+  }
+  rtl_neg(s, ddest, ddest);
+
   print_asm_template1(neg);
 }
 
