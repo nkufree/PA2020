@@ -69,7 +69,7 @@ int sprintf(char *out, const char *fmt, ...) {
     }
     fmt++;
   }
-  
+  out[out_index] = '\0';
   return 0;
 }
 
