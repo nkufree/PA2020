@@ -43,6 +43,7 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
     case 8:  s.samples = audio_base[reg_samples]; break;
     default: break;
   }
+	printf("freq: %d, channels: %d, samples:%d\n", s.freq, s.channels, s.samples);
 }
 
 void init_audio() {
