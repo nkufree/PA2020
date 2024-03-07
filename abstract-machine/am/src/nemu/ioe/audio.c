@@ -21,7 +21,6 @@ void __am_audio_config(AM_AUDIO_CONFIG_T *cfg) {
 }
 
 void __am_audio_ctrl(AM_AUDIO_CTRL_T *ctrl) {
-  printf("freq: %d, channels: %d, samples:%d\n", ctrl->freq, ctrl->channels, ctrl->samples);
   outl(AUDIO_FREQ_ADDR, ctrl->freq);
   outl(AUDIO_CHANNELS_ADDR, ctrl->channels);
   outl(AUDIO_SAMPLES_ADDR, ctrl->samples);
@@ -37,6 +36,7 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   {
     int nwrite = len > buf_size ? buf_size : len;
     while (inl(AUDIO_COUNT_ADDR) != 0);
+    printf("in: %d\n", *(uint8_t*)ctl->buf.start);
     memcpy((uint32_t*)(uintptr_t)AUDIO_SBUF_ADDR, ctl->buf.start, nwrite);
     outl(AUDIO_COUNT_ADDR, nwrite);
     len -= nwrite;

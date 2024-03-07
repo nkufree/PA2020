@@ -29,8 +29,10 @@ static inline void audio_play(void *userdata, uint8_t *stream, int len) {
   if (audio_base[reg_count] < len) 
 		nread = audio_base[reg_count];
   memcpy(stream, sbuf, nread);
+	printf("recv: %d\n", *stream);
   audio_base[reg_count] -= nread;
-  if (len > nread) memset(stream + nread, 0, len - nread);
+  if (len > nread) 
+		memset(stream + nread, 0, len - nread);
 }
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {
@@ -43,7 +45,6 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
     case 8:  s.samples = audio_base[reg_samples]; break;
     default: break;
   }
-	printf("freq: %d, channels: %d, samples:%d\n", s.freq, s.channels, s.samples);
 }
 
 void init_audio() {
