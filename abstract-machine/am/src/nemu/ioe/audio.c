@@ -17,7 +17,7 @@ void __am_audio_init() {
 }
 
 void __am_audio_config(AM_AUDIO_CONFIG_T *cfg) {
-  cfg->present = false;
+  cfg->present = true;
   cfg->bufsize = inl(AUDIO_SBUF_SIZE_ADDR);
   buf_size = cfg->bufsize;
 }
@@ -44,6 +44,8 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
     // printf("in: %d\n", *(uint8_t*)start);
     // printf("head: %d, num: %d, free: %d, len: %d, count: %d\n", head, head + nwrite, free, len, inl(AUDIO_COUNT_ADDR));
     // printf("in\n");
+    if(head + nwrite > buf_size)
+      continue;
     memcpy((uint32_t*)(uintptr_t)(AUDIO_SBUF_ADDR + head), start, nwrite);
     head = nwrite + head;
     if(head >= buf_size)
