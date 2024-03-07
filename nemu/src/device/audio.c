@@ -22,16 +22,21 @@ enum {
 
 static uint8_t *sbuf = NULL;
 static uint32_t *audio_base = NULL;
+static uint32_t head;
 static SDL_AudioSpec s = {};
 
 static inline void audio_play(void *userdata, uint8_t *stream, int len) {
 	printf("len: %d, audio_base[reg_count]: %d\n", len, audio_base[reg_count]);
 	int nread = len;
-  if (audio_base[reg_count] < len) 
-		nread = audio_base[reg_count];
+	int free = audio_base[reg_count] < STREAM_BUF_MAX_SIZE - head ? audio_base[reg_count] : STREAM_BUF_MAX_SIZE - head ;
+  if (free < len) 
+		nread = free;
   memcpy(stream, sbuf, nread);
 	printf("recv: %d\n", *stream);
   audio_base[reg_count] -= nread;
+	head += nread;
+	if(head >= STREAM_BUF_MAX_SIZE)
+		head = 0;
   if (len > nread) 
 		memset(stream + nread, 0, len - nread);
 }
@@ -57,6 +62,7 @@ void init_audio() {
   sbuf = (void *)new_space(STREAM_BUF_MAX_SIZE);
   add_mmio_map("audio-sbuf", STREAM_BUF, (void *)sbuf, STREAM_BUF_MAX_SIZE, NULL);
 	audio_base[reg_sbuf_size] = STREAM_BUF_MAX_SIZE;
+	head = 0;
 	SDL_AudioSpec s = {};
 	s.format = AUDIO_S16SYS;  // 假设系统中音频数据的格式总是使用16位有符号数来表示
 	s.userdata = NULL;        // 不使用

@@ -10,8 +10,10 @@
 #define AUDIO_COUNT_ADDR     (AUDIO_ADDR + 0x14)
 
 static int buf_size;
+static uint32_t head;
 
 void __am_audio_init() {
+  head = 0;
 }
 
 void __am_audio_config(AM_AUDIO_CONFIG_T *cfg) {
@@ -32,14 +34,18 @@ void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
 
 void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   int len = ctl->buf.end - ctl->buf.start;
+  void* start = ctl->buf.start;
   while(len > 0)
   {
-    int nwrite = len > buf_size ? buf_size : len;
-    while (inl(AUDIO_COUNT_ADDR) != 0);
-    printf("in: %d\n", *(uint8_t*)ctl->buf.start);
-    memcpy((uint32_t*)(uintptr_t)AUDIO_SBUF_ADDR, ctl->buf.start, nwrite);
-    outl(AUDIO_COUNT_ADDR, nwrite);
+    int free = inl(AUDIO_COUNT_ADDR) < head ? buf_size - head : buf_size - inl(AUDIO_COUNT_ADDR);
+    int nwrite = len > free ? free : len;
+    printf("in: %d\n", *(uint8_t*)start);
+    memcpy((uint32_t*)(uintptr_t)(AUDIO_SBUF_ADDR + head), start, nwrite);
+    head = AUDIO_SBUF_ADDR + head;
+    if(head >= buf_size)
+      head = 0;
+    outl(AUDIO_COUNT_ADDR, inl(AUDIO_COUNT_ADDR) + nwrite);
+    start += nwrite;
     len -= nwrite;
   }
-  
 }
