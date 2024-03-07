@@ -22,25 +22,25 @@ enum {
 
 static uint8_t *sbuf = NULL;
 static uint32_t *audio_base = NULL;
-static uint32_t head;
+static uint32_t tail;
 static SDL_AudioSpec s = {};
 
 static inline void audio_play(void *userdata, uint8_t *stream, int len) {
 	// printf("freq: %d, channels: %d, samples: %d\n", s.freq, s.channels, s.samples);
 	// printf("len: %d, audio_base[reg_count]: %d, head: %d\n", len, audio_base[reg_count], head);
 	int nread = len;
-	int free = audio_base[reg_count] < STREAM_BUF_MAX_SIZE - head ? audio_base[reg_count] : STREAM_BUF_MAX_SIZE - head ;
-  if(free < len) 
-		nread = free;
-  memcpy(stream, sbuf + head, nread);
-	// printf("num2: %d\n", head + nread);
-	// printf("recv: %d\n", *stream);
+	if (audio_base[reg_count] < len) nread = audio_base[reg_count];
+
+  if (nread + tail < STREAM_BUF_MAX_SIZE) {
+    memcpy(stream, sbuf + tail, nread);
+    tail += nread;
+  } else {
+    int first_cpy_len = STREAM_BUF_MAX_SIZE - tail;
+    memcpy(stream, sbuf + tail, first_cpy_len);
+    memcpy(stream + first_cpy_len, sbuf, nread - first_cpy_len);
+    tail = nread - first_cpy_len;
+  }
   audio_base[reg_count] -= nread;
-	// printf("audio_base[reg_count]: %d, nread: %d\n", audio_base[reg_count], nread);
-	head += nread;
-	if(head >= STREAM_BUF_MAX_SIZE)
-		head = 0;
-  if(len > nread) 
 		memset(stream + nread, 0, len - nread);
 }
 
@@ -68,7 +68,7 @@ void init_audio() {
   sbuf = (void *)new_space(STREAM_BUF_MAX_SIZE);
   add_mmio_map("audio-sbuf", STREAM_BUF, (void *)sbuf, STREAM_BUF_MAX_SIZE, NULL);
 	audio_base[reg_sbuf_size] = STREAM_BUF_MAX_SIZE;
-	head = 0;
+	tail = 0;
 	s.format = AUDIO_S16SYS;  // 假设系统中音频数据的格式总是使用16位有符号数来表示
 	s.userdata = NULL;        // 不使用
 	s.callback = audio_play;
