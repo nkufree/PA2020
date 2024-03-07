@@ -29,7 +29,9 @@ static inline void audio_play(void *userdata, uint8_t *stream, int len) {
 		nread = audio_base[reg_count];
   memcpy(stream, sbuf, nread);
   audio_base[reg_count] -= nread;
+	printf("02\n");
   if (len > nread) memset(stream + nread, 0, len - nread);
+	printf("03\n");
 }
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {
