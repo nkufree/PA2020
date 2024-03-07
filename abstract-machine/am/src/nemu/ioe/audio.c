@@ -11,7 +11,7 @@
 
 static int buf_size;
 static uint32_t head;
-static int buf_tail = 0;
+static int buf_tail = -1;
 
 void __am_audio_init() {
   head = 0;
@@ -56,7 +56,7 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   while (ptr < ctl->buf.end) {
     if (buf_tail == buf_size) buf_tail = 0;
     else ++buf_tail;
-    outb(AUDIO_SBUF_ADDR + buf_tail, *(uint8_t*)ptr);
+    *(uint8_t*)(uintptr_t)(AUDIO_SBUF_ADDR + buf_tail) = *(uint8_t*)ptr;
     ptr++;
     outl(AUDIO_COUNT_ADDR, inl(AUDIO_COUNT_ADDR) + 1);
   }
