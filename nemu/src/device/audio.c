@@ -25,38 +25,22 @@ static uint32_t *audio_base = NULL;
 static uint32_t head;
 static SDL_AudioSpec s = {};
 
-static int buf_head = 0, buf_size = STREAM_BUF_MAX_SIZE;
-
-void audio_play(void *userdata, uint8_t *stream, int len) {
-  int i = 0, nlen = len;
-  // Log("count: %d", count);
-  if (audio_base[reg_count] == 0) return;
-  if (audio_base[reg_count] < len) nlen = audio_base[reg_count];
-  while (i < nlen) {
-    if (buf_head == buf_size) buf_head = 0;
-    else ++buf_head;
-    stream[i++] = sbuf[buf_head];
-    audio_base[reg_count] = audio_base[reg_count] - 1;
-  }
-  while (i < len) stream[i++] = 0;
+static inline void audio_play(void *userdata, uint8_t *stream, int len) {
+	// printf("freq: %d, channels: %d, samples: %d\n", s.freq, s.channels, s.samples);
+	// printf("len: %d, audio_base[reg_count]: %d, head: %d\n", len, audio_base[reg_count], head);
+	int nread = len;
+	int free = audio_base[reg_count] < STREAM_BUF_MAX_SIZE - head ? audio_base[reg_count] : STREAM_BUF_MAX_SIZE - head ;
+  if(free < len) 
+		nread = free;
+  memcpy(stream, sbuf + head, nread);
+	// printf("recv: %d\n", *stream);
+  audio_base[reg_count] -= nread;
+	head += nread;
+	if(head >= STREAM_BUF_MAX_SIZE)
+		head = 0;
+  if(len > nread) 
+		memset(stream + nread, 0, len - nread);
 }
-
-// static inline void audio_play(void *userdata, uint8_t *stream, int len) {
-// 	// printf("freq: %d, channels: %d, samples: %d\n", s.freq, s.channels, s.samples);
-// 	// printf("len: %d, audio_base[reg_count]: %d, head: %d\n", len, audio_base[reg_count], head);
-// 	int nread = len;
-// 	int free = audio_base[reg_count] < STREAM_BUF_MAX_SIZE - head ? audio_base[reg_count] : STREAM_BUF_MAX_SIZE - head ;
-//   if(free < len) 
-// 		nread = free;
-//   memcpy(stream, sbuf + head, nread);
-// 	// printf("recv: %d\n", *stream);
-//   audio_base[reg_count] -= nread;
-// 	head += nread;
-// 	if(head >= STREAM_BUF_MAX_SIZE)
-// 		head = 0;
-//   if(len > nread) 
-// 		memset(stream + nread, 0, len - nread);
-// }
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {
 	assert(len == 4);
