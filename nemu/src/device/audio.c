@@ -33,10 +33,10 @@ static inline void audio_play(void *userdata, uint8_t *stream, int len) {
   if(free < len) 
 		nread = free;
   memcpy(stream, sbuf + head, nread);
-	printf("audio_base[reg_count]: %d, nread: %d\n", audio_base[reg_count], nread);
 	// printf("num2: %d\n", head + nread);
 	// printf("recv: %d\n", *stream);
   audio_base[reg_count] -= nread;
+	printf("audio_base[reg_count]: %d, nread: %d\n", audio_base[reg_count], nread);
 	head += nread;
 	if(head >= STREAM_BUF_MAX_SIZE)
 		head = 0;
