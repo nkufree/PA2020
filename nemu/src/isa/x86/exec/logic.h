@@ -69,10 +69,41 @@ static inline def_EHelper(shr) {
   print_asm_template2(shr);
 }
 
-// static inline def_EHelper(rol) {
-//   rtl_
-//   print_asm_template2(rol);
-// }
+static inline def_EHelper(rol) {
+  rtl_mv(s,s0,dsrc1);
+  while(*s0 != 0)
+  {
+    if(s->isa.is_operand_size_16)
+    {
+      rtl_msb(s,s1,ddest,2);
+      *ddest = *ddest * 2 +*s1;
+      rtl_andi(s,ddest,ddest,0xffff);
+    }
+    else{
+      rtl_msb(s,s1,ddest,4);
+      *ddest = *ddest * 2 +*s1;
+    }
+    rtl_subi(s,s0,s0,1);
+  }
+}
+
+static inline def_EHelper(ror) {
+  rtl_mv(s,s0,dsrc1);
+  while(*s0 != 0)
+  {
+    if(s->isa.is_operand_size_16)
+    {
+      rtl_andi(s,s1,ddest,1);
+      *ddest = *ddest / 2 +((*s1)<<15);
+      rtl_andi(s,ddest,ddest,0xffff);
+    }
+    else{
+      rtl_andi(s,s1,ddest,1);
+      *ddest = *ddest / 2 +(*s1 << 31);
+    }
+    rtl_subi(s,s0,s0,1);
+  }
+}
 
 static inline def_EHelper(bsr) {
   if(*dsrc1 == 0)
