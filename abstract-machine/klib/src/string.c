@@ -76,10 +76,22 @@ int strncmp(const char* s1, const char* s2, size_t n) {
 }
 
 void* memset(void* v,int c,size_t n) {
+  char* tmp = v;
+  for(int i = 0; i < n; i++)
+  {
+    *tmp = c;
+    tmp++;
+  }
   return NULL;
 }
 
 void* memmove(void* dst,const void* src,size_t n) {
+  for(int i = 0; i < n; i++)
+  {
+    *(char*)dst = *(char*)src;
+    dst++;
+    src++;
+  }
   return NULL;
 }
 
@@ -111,6 +123,13 @@ void* memcpy(void* out, const void* in, size_t n) {
 }
 
 int memcmp(const void* s1, const void* s2, size_t n) {
+  for(int i = 0; i < n; i++)
+  {
+    if(*(char*)s1 != *(char*)s2)
+      return *(char*)s1 - *(char*)s2;
+    s1++;
+    s2++;
+  }
   return 0;
 }
 
