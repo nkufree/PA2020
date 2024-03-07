@@ -56,9 +56,9 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   while (ptr < ctl->buf.end) {
     if (buf_tail == buf_size) buf_tail = 0;
     else ++buf_tail;
+    printf("1\n");
     outb(AUDIO_SBUF_ADDR + buf_tail, *(uint8_t*)ptr);
     ptr++;
-    printf("1\n");
     outl(AUDIO_COUNT_ADDR, inl(AUDIO_COUNT_ADDR) + 1);
   }
 }
