@@ -35,8 +35,8 @@ void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
 void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   int len = ctl->buf.end - ctl->buf.start;
   void* start = ctl->buf.start;
-  while(len > 0)
-  {
+  // while(len > 0)
+  // {
     int free = buf_size - inl(AUDIO_COUNT_ADDR);
     int nwrite = len < free ? len : free;
     // printf("in: %d\n", *(uint8_t*)start);
@@ -57,5 +57,5 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
     outl(AUDIO_COUNT_ADDR, inl(AUDIO_COUNT_ADDR) + nwrite);
     start += nwrite;
     len -= nwrite;
-  }
+  // }
 }
