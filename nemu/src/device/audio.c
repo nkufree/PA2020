@@ -30,7 +30,6 @@ static inline void audio_play(void *userdata, uint8_t *stream, int len) {
 		nread = audio_base[reg_count];
   memcpy(stream, sbuf, nread);
   audio_base[reg_count] -= nread;
-	printf("n: %d, nread: %d\n", len, nread);
   if (len > nread) memset(stream + nread, 0, len - nread);
 }
 
