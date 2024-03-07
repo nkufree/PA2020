@@ -93,7 +93,7 @@ void* memmove(void* dst,const void* src,size_t n) {
     dst++;
     src++;
   }
-  return dst;
+  return ret;
 }
 
 void* memcpy(void* out, const void* in, size_t n) {
@@ -131,7 +131,7 @@ int memcmp(const void* s1, const void* s2, size_t n) {
     s1++;
     s2++;
   }
-  return 0;
+  return *(char*)s1 - *(char*)s2;
 }
 
 #endif
