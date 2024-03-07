@@ -58,6 +58,7 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
     else ++buf_tail;
     outb(AUDIO_SBUF_ADDR + buf_tail, *(uint8_t*)ptr);
     ptr++;
+    printf("1\n");
     outl(AUDIO_COUNT_ADDR, inl(AUDIO_COUNT_ADDR) + 1);
   }
 }
