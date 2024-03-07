@@ -25,6 +25,7 @@ static uint32_t *audio_base = NULL;
 static SDL_AudioSpec s = {};
 
 static inline void audio_play(void *userdata, uint8_t *stream, int len) {
+	printf("len: %d, audio_base[reg_count]: %d\n", len, audio_base[reg_count]);
 	int nread = len;
   if (audio_base[reg_count] < len) 
 		nread = audio_base[reg_count];
