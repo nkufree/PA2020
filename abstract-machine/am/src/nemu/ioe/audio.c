@@ -11,6 +11,7 @@
 
 static int buf_size;
 static uint32_t head;
+static int buf_tail = -1, buf_size = -1;
 
 void __am_audio_init() {
   head = 0;
@@ -32,20 +33,31 @@ void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
   stat->count = inl(AUDIO_COUNT_ADDR);
 }
 
+// void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
+//   int len = ctl->buf.end - ctl->buf.start;
+//   void* start = ctl->buf.start;
+//   while(len > 0)
+//   {
+//     int free = inl(AUDIO_COUNT_ADDR) < head ? buf_size - head : buf_size - inl(AUDIO_COUNT_ADDR);
+//     int nwrite = len < free ? len : free;
+//     // printf("in: %d\n", *(uint8_t*)start);
+//     memcpy((uint32_t*)(uintptr_t)(AUDIO_SBUF_ADDR + head), start, nwrite);
+//     head = nwrite + head;
+//     if(head >= buf_size)
+//       head = 0;
+//     outl(AUDIO_COUNT_ADDR, inl(AUDIO_COUNT_ADDR) + nwrite);
+//     start += nwrite;
+//     len -= nwrite;
+//   }
+// }
+
 void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
-  int len = ctl->buf.end - ctl->buf.start;
-  void* start = ctl->buf.start;
-  while(len > 0)
-  {
-    int free = inl(AUDIO_COUNT_ADDR) < head ? buf_size - head : buf_size - inl(AUDIO_COUNT_ADDR);
-    int nwrite = len < free ? len : free;
-    // printf("in: %d\n", *(uint8_t*)start);
-    memcpy((uint32_t*)(uintptr_t)(AUDIO_SBUF_ADDR + head), start, nwrite);
-    head = nwrite + head;
-    if(head >= buf_size)
-      head = 0;
-    outl(AUDIO_COUNT_ADDR, inl(AUDIO_COUNT_ADDR) + nwrite);
-    start += nwrite;
-    len -= nwrite;
+  void *ptr = ctl->buf.start;
+  while (ptr < ctl->buf.end) {
+    if (buf_tail == buf_size) buf_tail = 0;
+    else ++buf_tail;
+    outb(AUDIO_SBUF_ADDR + buf_tail, *(uint8_t*)ptr);
+    ptr++;
+    outl(AUDIO_COUNT_ADDR, inl(AUDIO_COUNT_ADDR) + 1);
   }
 }
