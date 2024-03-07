@@ -4,15 +4,15 @@
 uint64_t start_time;
 
 void __am_timer_init() {
-  uint64_t low = inl(RTC_ADDR);
-  uint64_t high = inl(RTC_ADDR + 4);
-  start_time = high * 1000000  + low;
+  uint64_t usec = inl(RTC_ADDR);
+  uint64_t sec = inl(RTC_ADDR + 4);
+  start_time = sec * 1000000  + usec;
 }
 
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
-  uint64_t low = inl(RTC_ADDR);
-  uint64_t high = inl(RTC_ADDR + 4);
-  uptime->us = high * 1000000 + low - start_time;
+  uint64_t usec = inl(RTC_ADDR);
+  uint64_t sec = inl(RTC_ADDR + 4);
+  uptime->us = sec * 1000000 + usec - start_time;
 }
 
 void __am_timer_rtc(AM_TIMER_RTC_T *rtc) {

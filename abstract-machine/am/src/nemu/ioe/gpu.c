@@ -3,13 +3,9 @@
 #include <klib.h>
 
 #define SYNC_ADDR (VGACTL_ADDR + 4)
-#ifdef MODE_800x600
-#define W 800
-#define H 600
-#else
-#define W 400
-#define H 300
-#endif
+
+uint32_t screen_width, screen_height;
+
 
 void __am_gpu_init() {
   // int i;
@@ -28,13 +24,15 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
     .width = inw(VGACTL_ADDR+2), .height = inw(VGACTL_ADDR),
     .vmemsz = 0
   };
+  screen_width = cfg->width;
+  screen_height = cfg->height;
 }
 
 void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
-  uint32_t (*fb)[W] = (uint32_t (*)[W])(uintptr_t)FB_ADDR;
+  uint32_t (*fb)[screen_width] = (uint32_t (*)[screen_width])(uintptr_t)FB_ADDR;
   uint32_t (*pixels)[ctl->w] = ctl->pixels;
-  int rw = ctl->x + ctl->w > W ? W : ctl->x + ctl->w;
-  int bh = ctl->y + ctl->h > H ? H : ctl->y + ctl->h;
+  int rw = ctl->x + ctl->w > screen_width ? screen_width : ctl->x + ctl->w;
+  int bh = ctl->y + ctl->h > screen_height ? screen_height : ctl->y + ctl->h;
   for(int x = ctl->x; x < rw; x++)
   {
     for(int y = ctl->y; y < bh; y++)
