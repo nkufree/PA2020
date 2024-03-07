@@ -25,7 +25,7 @@ static uint32_t *audio_base = NULL;
 static uint32_t head;
 static SDL_AudioSpec s = {};
 
-static int buf_head = -1, buf_size = STREAM_BUF_MAX_SIZE;
+static int buf_head = 0, buf_size = STREAM_BUF_MAX_SIZE;
 
 void audio_play(void *userdata, uint8_t *stream, int len) {
   int i = 0, nlen = len;
