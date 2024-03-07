@@ -27,7 +27,7 @@ static SDL_AudioSpec s = {};
 
 static inline void audio_play(void *userdata, uint8_t *stream, int len) {
 	// printf("freq: %d, channels: %d, samples: %d\n", s.freq, s.channels, s.samples);
-	// printf("len: %d, audio_base[reg_count]: %d, head: %d\n", len, audio_base[reg_count], head);
+	printf("len: %d, audio_base[reg_count]: %d, head: %d\n", len, audio_base[reg_count], head);
 	int nread = len;
 	int free = audio_base[reg_count] < STREAM_BUF_MAX_SIZE - head ? audio_base[reg_count] : STREAM_BUF_MAX_SIZE - head ;
   if(free < len) 
