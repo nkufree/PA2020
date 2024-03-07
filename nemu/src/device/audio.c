@@ -41,6 +41,7 @@ static inline void audio_play(void *userdata, uint8_t *stream, int len) {
     tail = nread - first_cpy_len;
   }
   audio_base[reg_count] -= nread;
+	if (len > nread)
 		memset(stream + nread, 0, len - nread);
 }
 
