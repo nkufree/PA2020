@@ -29,22 +29,23 @@ static inline void audio_play(void *userdata, uint8_t *stream, int len) {
 		nread = audio_base[reg_count];
   memcpy(stream, sbuf, nread);
   audio_base[reg_count] -= nread;
-	printf("02\n");
   if (len > nread) memset(stream + nread, 0, len - nread);
-	printf("03\n");
 }
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {
-	SDL_AudioSpec s = {};
-	s.format = AUDIO_S16SYS;  // 假设系统中音频数据的格式总是使用16位有符号数来表示
-	s.userdata = NULL;        // 不使用
-	s.freq = audio_base[reg_freq];
-	s.channels = audio_base[reg_channels];
-	s.samples = audio_base[reg_samples];
-  s.callback = audio_play;
-	SDL_InitSubSystem(SDL_INIT_AUDIO);
-	SDL_OpenAudio(&s, NULL);
-	SDL_PauseAudio(0);
+	if(is_write || audio_base[reg_count] == 0)
+	{
+		SDL_AudioSpec s = {};
+		s.format = AUDIO_S16SYS;  // 假设系统中音频数据的格式总是使用16位有符号数来表示
+		s.userdata = NULL;        // 不使用
+		s.freq = audio_base[reg_freq];
+		s.channels = audio_base[reg_channels];
+		s.samples = audio_base[reg_samples];
+		s.callback = audio_play;
+		SDL_InitSubSystem(SDL_INIT_AUDIO);
+		SDL_OpenAudio(&s, NULL);
+		SDL_PauseAudio(0);
+	}
 }
 
 void init_audio() {
