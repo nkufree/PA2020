@@ -68,9 +68,11 @@ void init_audio() {
   sbuf = (void *)new_space(STREAM_BUF_MAX_SIZE);
   add_mmio_map("audio-sbuf", STREAM_BUF, (void *)sbuf, STREAM_BUF_MAX_SIZE, NULL);
 	audio_base[reg_sbuf_size] = STREAM_BUF_MAX_SIZE;
+	audio_base[reg_init] = 1;
 	head = 0;
 	s.format = AUDIO_S16SYS;  // 假设系统中音频数据的格式总是使用16位有符号数来表示
 	s.userdata = NULL;        // 不使用
 	s.callback = audio_play;
+
 }
 #endif	/* HAS_IOE */
