@@ -82,17 +82,18 @@ void* memset(void* v,int c,size_t n) {
     *tmp = c;
     tmp++;
   }
-  return NULL;
+  return v;
 }
 
 void* memmove(void* dst,const void* src,size_t n) {
+  void* ret = dst;
   for(int i = 0; i < n; i++)
   {
     *(char*)dst = *(char*)src;
     dst++;
     src++;
   }
-  return NULL;
+  return dst;
 }
 
 void* memcpy(void* out, const void* in, size_t n) {
