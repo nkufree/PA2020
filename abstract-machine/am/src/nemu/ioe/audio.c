@@ -39,7 +39,7 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   {
     int free = inl(AUDIO_COUNT_ADDR) < head ? buf_size - head : buf_size - inl(AUDIO_COUNT_ADDR);
     int nwrite = len > free ? free : len;
-    printf("in: %d\n", *(uint8_t*)start);
+    // printf("in: %d\n", *(uint8_t*)start);
     memcpy((uint32_t*)(uintptr_t)(AUDIO_SBUF_ADDR + head), start, nwrite);
     head = nwrite + head;
     if(head >= buf_size)
