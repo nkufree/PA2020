@@ -36,8 +36,8 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   {
     int nwrite = len > buf_size ? buf_size : len;
     while (inl(AUDIO_COUNT_ADDR) != 0);
-    printf("1 :%d\n", *((uint32_t*)(uintptr_t)AUDIO_SBUF_ADDR));
     memcpy((uint32_t*)(uintptr_t)AUDIO_SBUF_ADDR, ctl->buf.start, nwrite);
+    printf("1 :%d\n", *((uint32_t*)(uintptr_t)AUDIO_SBUF_ADDR));
     outl(AUDIO_COUNT_ADDR, nwrite);
     len -= nwrite;
   }
