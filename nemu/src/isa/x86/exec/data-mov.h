@@ -92,3 +92,10 @@ static inline def_EHelper(lea) {
   operand_write(s, id_dest, ddest);
   print_asm_template2(lea);
 }
+
+static inline def_EHelper(xchg) {
+  *s0 = *ddest;
+  operand_write(s, id_dest, dsrc1);
+  operand_write(s, id_src1, s0);
+  print_asm_template2(xchg);
+}

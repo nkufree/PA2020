@@ -304,6 +304,11 @@ static inline def_DHelper(none) {
 
 }
 
+static inline def_DHelper(xchg) {
+  decode_op_r(s, id_src1, true);
+  operand_reg(s, id_dest, true, R_EAX, 4);
+}
+
 static inline def_DHelper(leave) {
   if(id_dest->width == 2)
   {
