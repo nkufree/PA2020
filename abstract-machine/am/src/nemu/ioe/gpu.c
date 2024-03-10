@@ -4,7 +4,7 @@
 
 #define SYNC_ADDR (VGACTL_ADDR + 4)
 
-static uint32_t screen_width, screen_height;
+static uint32_t screen_width = 400, screen_height = 300;
 
 
 void __am_gpu_init() {
