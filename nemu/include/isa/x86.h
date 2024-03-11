@@ -48,7 +48,6 @@ typedef struct {
     11: OF
   */
   uint32_t eflags;
-  uint32_t cs;
   vaddr_t pc;
 } x86_CPU_state;
 
