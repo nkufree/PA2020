@@ -17,6 +17,7 @@ static inline def_EHelper(pusha) {
   assert(id_dest->width == 4);
   // TODO: width = 2
   *s0 = reg_l(R_ESP);
+  printf("eax: %d, edx : %d\n", reg_l(R_EAX), reg_l(R_EDX));
   rtl_push(s, &reg_l(R_EAX));
   rtl_push(s, &reg_l(R_ECX));
   rtl_push(s, &reg_l(R_EDX));
