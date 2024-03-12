@@ -240,6 +240,7 @@ again:
     IDEX (0x61, none, popa)
     IDEXW(0x6a, push_SI, push, 1)
     IDEX (0x68, push_SI, push)
+    IDEX (0x69, I_E2G, imul3)
     IDEXW(0x70, J, jcc, 1)
     IDEXW(0x71, J, jcc, 1)
     IDEXW(0x72, J, jcc, 1)
