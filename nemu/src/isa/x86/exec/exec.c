@@ -53,18 +53,12 @@ static inline def_EHelper(gp3) {
       exec_test(s);
       break;
     EMPTY(1)
-    // GPEXEC(2, not)
-    // GPEXEC(3, neg)
-    // GPEXEC(4, mul)
-    // GPEXEC(5, imul1)
-    // GPEXEC(6, div)
-    // GPEXEC(7, idiv)
-    EXW(0x2,not,-1)//not
-    EXW(0x3,neg,-1)
-    EXW(0x4,mul,-1)//mul
-    EXW(0x5,imul1,-1)//imul
-    EXW(0x6,div,-1)//div
-    EXW(0x7,idiv,-1)//idiv
+    GPEXEC(2, not)
+    GPEXEC(3, neg)
+    GPEXEC(4, mul)
+    GPEXEC(5, imul1)
+    GPEXEC(6, div)
+    GPEXEC(7, idiv)
     default:
       break;
   }
