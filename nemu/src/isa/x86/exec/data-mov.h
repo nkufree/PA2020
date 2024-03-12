@@ -88,6 +88,30 @@ static inline def_EHelper(movzx) {
   print_asm_template2(movzx);
 }
 
+static inline def_EHelper(movs) 
+{
+  switch(id_dest->width)
+  {
+    case 1: 
+      rtl_lms(s,s0,&cpu.esi,0,1);
+      rtl_sm(s,&cpu.edi,0,s0,1);
+      *s1 = 1;
+      break;
+    case 2:
+      rtl_lms(s,s0,&cpu.esi,0,2);
+      rtl_sm(s,&cpu.edi,0,s0,2);
+      *s1 = 2;
+      break;
+    case 4:
+      rtl_lms(s,s0,&cpu.esi,0,4);
+      rtl_sm(s,&cpu.edi,0,s0,4);
+      *s1 = 4;
+      break;  
+  }
+  rtl_add(s,&cpu.esi,&cpu.esi,s1);
+  rtl_add(s,&cpu.edi,&cpu.edi,s1);
+}
+
 static inline def_EHelper(lea) {
   rtl_addi(s, ddest, s->isa.mbase, s->isa.moff);
   operand_write(s, id_dest, ddest);
