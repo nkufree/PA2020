@@ -23,6 +23,12 @@ void do_syscall(Context *c) {
       else
         c->GPRx = 0;
       break;
+    case SYS_brk: // a[1]: space
+      if(malloc(a[1]) != NULL)
+        c->GPRx = 0;
+      else 
+        c->GPRx = -1;
+      break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }
