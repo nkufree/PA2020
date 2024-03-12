@@ -9,8 +9,7 @@ static inline def_EHelper(push) {
 }
 
 static inline def_EHelper(pop) {
-  rtl_pop(s, s0);
-  operand_write(s,id_dest,s0);
+  rtl_pop(s, ddest);
   print_asm_template1(pop);
 }
 
