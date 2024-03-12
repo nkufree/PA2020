@@ -92,6 +92,14 @@ repeat:
             fmtp->fmt++;
             fmtp->state = FMT_D;
             itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 16);
+            while(fmtp->helplen < sizeof(uintptr_t))
+            {
+              fmtp->helpd[fmtp->helplen] = '0';
+              fmtp->helplen++;
+            }
+            fmtp->helpd[fmtp->helplen] = 'x';
+            fmtp->helpd[fmtp->helplen + 1] = '0';
+            fmtp->helplen+=2;
             break;
         }
         goto repeat;
