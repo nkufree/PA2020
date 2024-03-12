@@ -43,7 +43,7 @@ static inline def_EHelper(iret) {
   rtl_pop(s, s0);
   rtl_pop(s, &(cpu.cs));
   rtl_pop(s, &(cpu.eflags));
-  rtl_j(s,*s1);
+  rtl_j(s,*s0);
   print_asm("iret");
 
 #ifndef __DIFF_REF_NEMU__
