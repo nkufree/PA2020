@@ -88,6 +88,11 @@ repeat:
             fmtp->helplen = -1;
             fmtp->helps = va_arg(fmtp->ap, char*);
             break;
+          case 'x':
+            fmtp->fmt++;
+            fmtp->state = FMT_D;
+            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 16);
+            break;
           case 'p':
             fmtp->fmt++;
             fmtp->state = FMT_D;
