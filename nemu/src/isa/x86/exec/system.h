@@ -40,14 +40,10 @@ static inline def_EHelper(int) {
 }
 
 static inline def_EHelper(iret) {
-//   rtl_pop(s, &(cpu.pc));
-//   rtl_pop(s, &(cpu.cs));
-//   rtl_pop(s, &(cpu.eflags));
-    rtl_pop(s,s1);
-    //printf("%x %x %x\n",cpu.pc,*s0,s->is_jmp);
-    rtl_pop(s,&cpu.cs);
-    rtl_pop(s,&cpu.eflags);
-    rtl_j(s,*s1);
+  rtl_pop(s, s0);
+  rtl_pop(s, &(cpu.cs));
+  rtl_pop(s, &(cpu.eflags));
+  rtl_j(s,*s1);
   print_asm("iret");
 
 #ifndef __DIFF_REF_NEMU__
