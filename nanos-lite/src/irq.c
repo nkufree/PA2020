@@ -3,7 +3,7 @@
 void do_syscall(Context *c);
 
 static Context* do_event(Event e, Context* c) {
-  printf("eip: %p", c->eip);
+  printf("eip: %p\n", c->eip);
   switch (e.event) {
     case EVENT_SYSCALL: do_syscall(c); break;
     case EVENT_YIELD: printf("trap at yield, pc=%d\n", c->eip); break;
