@@ -17,7 +17,7 @@ typedef struct {
   char* helps;
 } fmt_parser;
 
-static void itora(int num, char* s, int* len)
+static void itora(int num, char* s, int* len, int base)
 {
   bool minus = num < 0;
   if(minus)
@@ -33,9 +33,17 @@ static void itora(int num, char* s, int* len)
   int tmp;
   while (num != 0)
   {
-    tmp = num % 10;
-    num = num / 10;
-    s[curr_len] = tmp + '0';
+    tmp = num % base;
+    num = num / base;
+    if(base == 10)
+      s[curr_len] = tmp + '0';
+    else if(base == 16)
+    {
+      if(tmp < 10)
+        s[curr_len] = tmp + '0';
+      else
+        s[curr_len] = tmp - 10 + 'a';
+    }
     curr_len++;
   }
   if(minus)
@@ -72,13 +80,18 @@ repeat:
           case 'd':
             fmtp->fmt++;
             fmtp->state = FMT_D;
-            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen);
+            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 10);
             break;
           case 's':
             fmtp->fmt++;
             fmtp->state = FMT_S;
             fmtp->helplen = -1;
             fmtp->helps = va_arg(fmtp->ap, char*);
+            break;
+          case 'p':
+            fmtp->fmt++;
+            fmtp->state = FMT_D;
+            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 16);
             break;
         }
         goto repeat;
