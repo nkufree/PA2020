@@ -56,7 +56,7 @@ int fs_open(const char *pathname, int flags, int mode) {
 
 size_t fs_read(int fd, void *buf, size_t len) {
   Finfo* file = &file_table[fd];
-  printf("read openoff: %d, len: %d\n", file->open_offset, len);
+  // printf("read openoff: %d, len: %d\n", file->open_offset, len);
   size_t free_len = file->size - file->open_offset;
   size_t read_len = free_len < len ? free_len : len;
   ramdisk_read(buf, file->disk_offset + file->open_offset, read_len);
@@ -66,7 +66,7 @@ size_t fs_read(int fd, void *buf, size_t len) {
 
 size_t fs_write(int fd, const void *buf, size_t len) {
   Finfo* file = &file_table[fd];
-  printf("write openoff: %d, len: %d\n", file->open_offset, len);
+  // printf("write openoff: %d, len: %d\n", file->open_offset, len);
   size_t free_len = file->size - file->open_offset;
   size_t write_len = free_len < len ? free_len : len;
   ramdisk_write(buf, file->disk_offset + file->open_offset, write_len);
@@ -76,7 +76,7 @@ size_t fs_write(int fd, const void *buf, size_t len) {
 
 size_t fs_lseek(int fd, size_t offset, int whence) {
   Finfo* file = &file_table[fd];
-  printf("openoff: %d, off: %d, whe: %d\n", file->open_offset, offset, whence);
+  // printf("openoff: %d, off: %d, whe: %d\n", file->open_offset, offset, whence);
   switch (whence)
   {
   case SEEK_SET:
