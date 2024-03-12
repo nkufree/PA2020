@@ -19,7 +19,6 @@ typedef struct {
 
 static void itora(int num, char* s, int* len, int base)
 {
-  printf("num: %d\n", num);
   bool minus = num < 0;
   if(minus)
     num = -num;
