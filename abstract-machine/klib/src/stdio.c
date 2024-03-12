@@ -92,7 +92,7 @@ repeat:
             fmtp->fmt++;
             fmtp->state = FMT_D;
             itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 16);
-            while(fmtp->helplen < sizeof(uintptr_t))
+            while(fmtp->helplen < sizeof(uintptr_t) * 2)
             {
               fmtp->helpd[fmtp->helplen] = '0';
               fmtp->helplen++;
