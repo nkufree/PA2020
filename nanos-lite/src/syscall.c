@@ -14,7 +14,7 @@ void do_syscall(Context *c) {
     case SYS_write: // a[1]: fd, a[2]: buf, a[3]: count
       if(a[1] == 1 || a[1] == 2)
       {
-        printf("count: %d", a[3]);
+        printf("count: %d\n", a[3]);
         for(int i = 0; i < a[3]; i++)
         {
           putch(*(char*)(uintptr_t)(a[2] + i));
