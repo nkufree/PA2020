@@ -80,11 +80,11 @@ size_t fs_lseek(int fd, size_t offset, int whence) {
     file->open_offset = offset;
     break;
   case SEEK_CUR:
-    assert((file->open_offset + offset) >=0 && (file->open_offset + offset) <= 0);
+    assert((file->open_offset + offset) >=0 && (file->open_offset + offset) <= file->size);
     file->open_offset += offset;
     break;
   case SEEK_END:
-    assert((file->open_offset - offset) >=0 && (file->open_offset - offset) <= 0);
+    assert((file->open_offset - offset) >=0 && (file->open_offset - offset) <= file->size);
     file->open_offset = file->size - offset;
     break;
   default:
