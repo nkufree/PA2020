@@ -37,6 +37,8 @@ void NDL_OpenCanvas(int *w, int *h) {
   }
   canvas_w = *w < screen_w ? *w : screen_w;
   canvas_h = *h < screen_h ? *h : screen_h;
+  canvas_off_x = (canvas_w - *w) >> 1;
+  canvas_off_y = (canvas_h - *h) >> 1;
   if (getenv("NWM_APP")) {
     int fbctl = 4;
     fbdev = 5;
@@ -90,8 +92,8 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   int height = y + h < canvas_h ? y + h : canvas_h;
   for(int row = y; row < height; row++)
   {
-    fseek(f_fb, (row * screen_w + x) << 2, SEEK_SET);
-    fwrite(pixels + (row - y) * w, 1, width << 2, f_fb);
+    fseek(f_fb, (row * screen_w + x + canvas_off_x) << 2, SEEK_SET);
+    fwrite(pixels + (row - y + canvas_off_y) * w, 1, width << 2, f_fb);
   }
 }
 
