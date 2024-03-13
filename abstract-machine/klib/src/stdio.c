@@ -87,6 +87,8 @@ repeat:
             fmtp->state = FMT_S;
             fmtp->helplen = -1;
             fmtp->helps = va_arg(fmtp->ap, char*);
+            if(fmtp->helps[0] == '\0')
+              fmtp->state = FMT_USUAL;
             break;
           case 'x':
             fmtp->fmt++;
@@ -122,7 +124,7 @@ repeat:
       return fmtp->helpd[fmtp->helplen];
     case FMT_S:
       fmtp->helplen++;
-      if(fmtp->helps[fmtp->helplen] == '\0')
+      if(fmtp->helps[fmtp->helplen + 1] == '\0')
         fmtp->state = FMT_USUAL;
       return fmtp->helps[fmtp->helplen];
   }
