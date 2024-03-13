@@ -37,7 +37,11 @@ size_t dispinfo_read(void *buf, size_t offset, size_t len) {
 
 size_t fb_write(const void *buf, size_t offset, size_t len) {
   int width = io_read(AM_GPU_CONFIG).width;
-  io_write(AM_GPU_FBDRAW, (offset >> 2) % width, (offset >> 2) / width, (uint32_t*)buf, len >> 2, 1, true);
+  int x = (offset >> 2) % width;
+  int y = (offset >> 2) / width;
+  int w = len >> 2;
+  printf("x: %d, y: %d, w: %d\n", x, y, w);
+  io_write(AM_GPU_FBDRAW, x, y, (uint32_t*)buf, w, 1, true);
   return len;
 }
 
