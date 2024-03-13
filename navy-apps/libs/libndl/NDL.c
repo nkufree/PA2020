@@ -86,7 +86,7 @@ void get_dispinfo() {
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
-  int right = x + w < canvas_w ? x + w : canvas_w;
+  int width = x + w < canvas_w ? w : canvas_w - x;
   int height = y + h < canvas_h ? y + h : canvas_h;
   for(int row = y; row < height; row++)
   {
