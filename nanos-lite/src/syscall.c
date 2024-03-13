@@ -19,15 +19,15 @@ void do_syscall(Context *c) {
     case SYS_yield: yield(); c->GPRx = 0; break;
     case SYS_exit: halt(0); break;
     case SYS_write: // a[1]: fd, a[2]: buf, a[3]: count
-      if(a[1] == 1 || a[1] == 2)
-      {
-        for(int i = 0; i < a[3]; i++)
-        {
-          putch(*(char*)(uintptr_t)(a[2] + i));
-        }
-        c->GPRx = a[3];
-      }
-      else
+      // if(a[1] == 1 || a[1] == 2)
+      // {
+      //   for(int i = 0; i < a[3]; i++)
+      //   {
+      //     putch(*(char*)(uintptr_t)(a[2] + i));
+      //   }
+      //   c->GPRx = a[3];
+      // }
+      // else
         c->GPRx = fs_write(a[1], (void*)(uintptr_t)a[2], a[3]);
       break;
     case SYS_brk: // a[1]: space
