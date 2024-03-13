@@ -30,7 +30,7 @@ int NDL_PollEvent(char *buf, int len) {
 
 void NDL_OpenCanvas(int *w, int *h) {
   get_dispinfo();
-  printf("screenw: %d, screenh: %d\n", screen_w, screen_h);
+  // printf("screenw: %d, screenh: %d\n", screen_w, screen_h);
   if(*w == 0 && *h == 0) {
     *w = screen_w;
     *h = screen_h;
