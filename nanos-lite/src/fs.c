@@ -103,7 +103,7 @@ size_t fs_write(int fd, const void *buf, size_t len) {
 
 size_t fs_lseek(int fd, size_t offset, int whence) {
   Finfo* file = &file_table[fd];
-  printf("fd: %d,openoff: %d, off: %d, whe: %d\n", fd, file->open_offset, offset, whence);
+  printf("fd: %d, openoff: %d, off: %d, whe: %d\n", fd, file->open_offset, offset, whence);
   switch (whence)
   {
   case SEEK_SET:
