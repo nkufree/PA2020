@@ -1,21 +1,20 @@
 #include <stdio.h>
-#include <sys/time.h>
+#include <NDL.h>
 
 int main()
 {
-  struct timeval last, curr;
-  gettimeofday(&last, NULL);
+  NDL_Init(0);
+  uint32_t last, curr;
+  last = NDL_GetTicks();
   while(1)
   {
-    gettimeofday(&curr, NULL);
-    int timegap = (curr.tv_sec - last.tv_sec) * 2 
-    + (curr.tv_usec - last.tv_usec) * 2 / 1000000;
-    if(timegap >= 1)
+    curr = NDL_GetTicks();
+    if(curr - last >= 500)
     {
       printf("hello\n");
-      last.tv_sec = curr.tv_sec;
-      last.tv_usec = curr.tv_usec;
+      last = curr;
     }
   }
+  NDL_Quit();
   return 0;
 }
