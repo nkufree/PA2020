@@ -64,10 +64,10 @@ size_t fs_read(int fd, void *buf, size_t len) {
   size_t read_len = free_len < len ? free_len : len;
   if(file->read != NULL) {
     read_len = len;
-    file->read(buf, file->disk_offset + file->open_offset, read_len);
+    read_len = file->read(buf, file->disk_offset + file->open_offset, read_len);
   }
   else {
-    ramdisk_read(buf, file->disk_offset + file->open_offset, read_len);
+    read_len = ramdisk_read(buf, file->disk_offset + file->open_offset, read_len);
   }
   file->open_offset += read_len;
   return read_len;
@@ -80,10 +80,10 @@ size_t fs_write(int fd, const void *buf, size_t len) {
   size_t write_len = free_len < len ? free_len : len;
   if(file->write != NULL) {
     write_len = len;
-    file->write(buf, file->disk_offset + file->open_offset, write_len);
+    write_len = file->write(buf, file->disk_offset + file->open_offset, write_len);
   }
   else {
-    ramdisk_write(buf, file->disk_offset + file->open_offset, write_len);
+    write_len = ramdisk_write(buf, file->disk_offset + file->open_offset, write_len);
   }
   file->open_offset += write_len;
   return write_len;
