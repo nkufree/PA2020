@@ -31,11 +31,14 @@ size_t events_read(void *buf, size_t offset, size_t len) {
 }
 
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {
-  return 0;
+  sprintf(buf, "WIDTH:%d\nHEIGHT:%d\n", io_read(AM_GPU_CONFIG).width, io_read(AM_GPU_CONFIG).height);
+  return strlen((char*)buf);
 }
 
 size_t fb_write(const void *buf, size_t offset, size_t len) {
-  return 0;
+  int width = io_read(AM_GPU_CONFIG).width;
+  io_write(AM_GPU_FBDRAW, offset % width, offset / width, (uint32_t*)buf, len >> 2, 1, true);
+  return len;
 }
 
 void init_device() {

@@ -4,10 +4,18 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <assert.h>
 
 static int evtdev = -1;
 static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
+static int canvas_off_x = 0, canvas_off_y = 0;
+static int canvas_w = 0, canvas_h = 0;
+static int fd_event = -1, fd_dispinfo = -1;
+FILE* f_fb = NULL;
+
+void get_dispinfo();
+int open(const char *pathname, int flags, int mode);
 
 uint32_t NDL_GetTicks() {
   struct timeval tv;
@@ -16,13 +24,18 @@ uint32_t NDL_GetTicks() {
 }
 
 int NDL_PollEvent(char *buf, int len) {
-  int fd = open("/dev/events", 0, 0);
-  int ret = read(fd, buf, len);
-  close(fd);
+  int ret = read(fd_event, buf, len);
   return ret;
 }
 
 void NDL_OpenCanvas(int *w, int *h) {
+  get_dispinfo();
+  if(*w == 0 && *h == 0) {
+    *w = screen_w;
+    *h = screen_h;
+  }
+  canvas_w = *w < screen_w ? *w : screen_w;
+  canvas_h = *h < screen_h ? *h : screen_h;
   if (getenv("NWM_APP")) {
     int fbctl = 4;
     fbdev = 5;
@@ -42,7 +55,43 @@ void NDL_OpenCanvas(int *w, int *h) {
   }
 }
 
+void get_dispinfo() {
+  char tmp[40] = {};
+  read(fd_dispinfo, tmp, sizeof(tmp));
+  char* curr = tmp;
+  int find_height = 0, find_width = 0;
+  int* num = NULL;
+  while (!(find_height && find_width)) {
+    if(strncmp(curr, "HEIGHT", 6) == 0) {
+      curr += 6;
+      find_height = 1;
+      num = &screen_h;
+    }
+    else if(strncmp(curr, "WIDTH", 5) == 0) {
+      curr += 5;
+      find_width = 1;
+      num = &screen_w;
+    }
+    if(num == NULL) {
+      curr++;
+      continue;
+    }
+    while(*curr == ' ') curr++;
+    assert(*curr == ':');
+    curr++;
+    *num = atoi(curr);
+    num = NULL;
+  }
+}
+
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
+  int right = x + w < canvas_w ? x + w : canvas_w;
+  int height = y + h < canvas_h ? y + h : canvas_h;
+  for(int row = y; row < height; row++)
+  {
+    fseek(f_fb, row * screen_w + x, SEEK_SET);
+    fwrite(pixels + (row - y) * w, 4, w, f_fb);
+  }
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples) {
@@ -63,6 +112,9 @@ int NDL_Init(uint32_t flags) {
   if (getenv("NWM_APP")) {
     evtdev = 3;
   }
+  fd_event = open("/dev/events", 0, 0);
+  fd_dispinfo = open("/proc/dispinfo", 0, 0);
+  f_fb = fopen("/dev/fb", NULL);
   return 0;
 }
 

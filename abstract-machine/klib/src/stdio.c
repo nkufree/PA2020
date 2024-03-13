@@ -15,6 +15,7 @@ typedef struct {
   char helpd[20];
   int helplen;
   char* helps;
+  int total_len;
 } fmt_parser;
 
 static void itora(int num, char* s, int* len, int base)
@@ -59,6 +60,7 @@ static char get_char(fmt_parser* fmtp)
 {
   if(fmtp->end)
     return 0;
+  fmtp->total_len += 1;
 repeat:
   switch(fmtp->state)
   {
@@ -67,6 +69,7 @@ repeat:
       if(ch == '\0')
       {
         fmtp->end = true;
+        fmtp->total_len -= 1;
         return 0;
       }
       else if(ch == '%')
@@ -141,17 +144,17 @@ int printf(const char *fmt, ...) {
     putch(ch);
   }
   va_end(ap);
-  return 0;
+  return fmtp.total_len;
 }
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
-  fmt_parser fmtp = {fmt, ap, false};
+  fmt_parser fmtp = {fmt, ap, false, .total_len=0};
   while (!fmtp.end)
   {
     *out = get_char(&fmtp);
     out++;
   }
-  return 0;
+  return fmtp.total_len;
 }
 
 int sprintf(char *out, const char *fmt, ...) {
@@ -171,15 +174,13 @@ int snprintf(char *out, size_t n, const char *fmt, ...) {
 }
 
 int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
-  fmt_parser fmtp = {fmt, ap, false};
-  int len = 0;
-  while (!fmtp.end && len < n)
+  fmt_parser fmtp = {fmt, ap, false, .total_len=0};
+  while (!fmtp.end && fmtp.total_len < n)
   {
     *out = get_char(&fmtp);
     out++;
-    len++;
   }
-  return 0;
+  return fmtp.total_len;
 }
 
 #endif
