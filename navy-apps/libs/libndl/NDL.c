@@ -91,7 +91,7 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   for(int row = y; row < height; row++)
   {
     fseek(f_fb, row * screen_w + x, SEEK_SET);
-    fwrite(pixels + (row - y) * w, 4, w, f_fb);
+    fwrite(pixels + (row - y) * w, 1, width << 2, f_fb);
   }
 }
 
