@@ -66,6 +66,7 @@ int fs_open(const char *pathname, int flags, int mode) {
       return fd;
     }
   }
+  printf("no such file: %s\n", pathname);
   assert(0);
 }
 
