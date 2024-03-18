@@ -42,7 +42,7 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
 }
 
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
-  printf("fill rect: %d %d %d %d\n", dstrect->x, dstrect->y, dstrect->w, dstrect->h);
+  // printf("fill rect: %d %d %d %d\n", dstrect->x, dstrect->y, dstrect->w, dstrect->h);
   int x,y,w,h;
   if(dstrect == NULL) {
     x = 0;
