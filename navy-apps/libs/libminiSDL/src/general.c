@@ -1,10 +1,16 @@
 #include <NDL.h>
+#include <stdlib.h>
+
+uint8_t* keystate = NULL;
 
 int SDL_Init(uint32_t flags) {
+  keystate = malloc(256*sizeof(uint8_t));
+  memset(keystate,0,sizeof(keystate));
   return NDL_Init(flags);
 }
 
 void SDL_Quit() {
+  free(keystate);
   NDL_Quit();
 }
 
