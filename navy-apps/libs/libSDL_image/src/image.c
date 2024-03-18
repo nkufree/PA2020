@@ -11,7 +11,18 @@ SDL_Surface* IMG_Load_RW(SDL_RWops *src, int freesrc) {
 }
 
 SDL_Surface* IMG_Load(const char *filename) {
-  return NULL;
+  FILE *f = fopen(filename, "rb");
+  if(f == NULL)
+    return NULL;
+  fseek(f, 0, SEEK_END);
+  long size = ftell(f);
+  fseek(f, 0, SEEK_SET);
+  void *buf = malloc(size);
+  fread(buf, 1, size, f);
+  SDL_Surface *src = STBIMG_LoadFromMemory(buf, size);
+  fclose(f);
+  free(buf);
+  return src;
 }
 
 int IMG_isPNG(SDL_RWops *src) {
