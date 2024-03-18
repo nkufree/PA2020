@@ -97,6 +97,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
           uint8_t b = colors[*p].b;
           pixels[(i - y) * w + j - x] = (r << 16) | (g << 8) | b;
         }
+      printf("update rect 8BIT: %d %d %d %d\n", x, y, w, h);
       NDL_DrawRect(pixels, x, y, w, h);
       free(pixels);
     }
