@@ -30,7 +30,7 @@ int SDL_PollEvent(SDL_Event *ev) {
       break;
     }
   }
-  printf("event: %d\n", ev->key.keysym.sym);
+  printf("event: %d, keyname[%d]: %s\n", ev->key.keysym.sym, ev->key.keysym.sym, keyname[ev->key.keysym.sym]);
   return 1;
 }
 
