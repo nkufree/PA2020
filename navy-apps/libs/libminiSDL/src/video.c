@@ -78,7 +78,7 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
 }
 
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
-  printf("update rect: %d %d %d %d\n", x, y, w, h);
+  // printf("update rect: %d %d %d %d\n", x, y, w, h);
   if(w == 0 || w > s->w)
     w = s->w;
   if(h == 0 || h > s->h)
@@ -97,7 +97,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
           uint8_t b = colors[*p].b;
           pixels[(i - y) * w + j - x] = (r << 16) | (g << 8) | b;
         }
-      printf("update rect 8BIT: %d %d %d %d\n", x, y, w, h);
+      // printf("update rect 8BIT: %d %d %d %d\n", x, y, w, h);
       NDL_DrawRect(pixels, x, y, w, h);
       free(pixels);
     }
@@ -197,7 +197,7 @@ void SDL_SoftStretch(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   int h = (srcrect == NULL ? src->h : srcrect->h);
 
   assert(dstrect);
-  printf("soft stretch: %d %d %d %d -> %d %d %d %d\n", x, y, w, h, dstrect->x, dstrect->y, dstrect->w, dstrect->h);
+  // printf("soft stretch: %d %d %d %d -> %d %d %d %d\n", x, y, w, h, dstrect->x, dstrect->y, dstrect->w, dstrect->h);
   if(w == dstrect->w && h == dstrect->h) {
     /* The source rectangle and the destination rectangle
      * are of the same size. If that is the case, there
