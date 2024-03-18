@@ -93,8 +93,8 @@ void get_dispinfo() {
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
-  int width = x + w < canvas_w ? w : canvas_w - x;
-  int height = y + h < canvas_h ? y + h : canvas_h;
+  int width = x + w < canvas_w && w != 0 ? w : canvas_w - x;
+  int height = y + h < canvas_h && h != 0 ? y + h : canvas_h;
   for(int row = y; row < height; row++)
   {
     fseek(f_fb, ((row + canvas_off_y) * screen_w + x + canvas_off_x) << 2, SEEK_SET);
