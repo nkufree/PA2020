@@ -9,25 +9,25 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
   int x,y,w,h;
-  if(dstrect == NULL) {
+  if(srcrect == NULL) {
     x = 0;
     y = 0;
-    w = dst->w;
-    h = dst->h;
+    w = src->w;
+    h = src->h;
   }
   else {
-    x = dstrect->x;
-    y = dstrect->y;
-    w = dstrect->w;
-    h = dstrect->h;
+    x = srcrect->x;
+    y = srcrect->y;
+    w = srcrect->w;
+    h = srcrect->h;
   }
   if(src->format->BitsPerPixel == 32)
   {
     uint32_t *src_pixels = (uint32_t*)src->pixels;
     uint32_t *dst_pixels = (uint32_t*)dst->pixels;
-    for(int i = y; i < y + h; i++)
-      for(int j = x; j < x + w; j++)
-        dst_pixels[i * dst->w + j] = src_pixels[(i - y) * src->w + (j - x)];
+    for(int i = 0; i < h; i++)
+      for(int j = 0; j < w; j++)
+        dst_pixels[(i + dstrect->y) * dst->w + j + dstrect->x] = src_pixels[(i + y) * src->w + j + x];
   }
   else
     assert(0);
