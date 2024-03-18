@@ -95,18 +95,26 @@ void get_dispinfo() {
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
-  int real_w = w == 0 ? canvas_w : w;
-  int real_h = h == 0 ? canvas_h : h;
-  int width = x + real_w < canvas_w ? x + real_w : canvas_w;
-  int height = y + real_h < canvas_h ? y + real_h : canvas_h;
-  // printf("realw: %d, realh: %d\n", real_w, real_h);
-  // printf("width: %d, height: %d\n", width, height);
-  for(int row = y; row < height; row++)
+  assert(fb != NULL);
+  if(h == 0||h > canvas_h)
+    h = canvas_h;
+  if(w == 0||w > canvas_w)
+    w = canvas_w;
+  for(int i = 0;i < h;i ++)
+    for(int j = 0;j < w;j ++)
+    {
+      canvas[(y+i)*canvas_w+x+j] = pixels[i*w+j];
+    }
+  for(int i = 0;i < canvas_h;i ++)
   {
-    // printf("OFF : %d\n", ((row + canvas_off_y) * screen_w + x + canvas_off_x) << 2);
-    fseek(f_fb, ((row + canvas_off_y) * screen_w + x + canvas_off_x) << 2, SEEK_SET);
-    fwrite(pixels + (row - y) * real_w, 1, width << 2, f_fb);
+    //printf("seek %d color = %x\n",4*((i+place_y)*screen_w+place_x),*(canvas+i*canvas_w+canvas_w/2));
+    fseek(fb,4*((i+place_y)*screen_w+place_x),SEEK_SET);
+    fwrite((void*)(canvas+i*canvas_w),1,4*canvas_w,fb);
   }
+  //有可能有问题的部分  
+  //画布应该是一个虚拟对象，而不是一个实体数组(不知道）
+  //fseek(fb_sync,0,SEEK_SET);
+  //fwrite("1",1,1,fb_sync);
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples) {
