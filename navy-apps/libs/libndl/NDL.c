@@ -99,11 +99,11 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   int real_h = h == 0 ? canvas_h : h;
   int width = x + real_w < canvas_w ? x + real_w : canvas_w;
   int height = y + real_h < canvas_h ? y + real_h : canvas_h;
-  printf("realw: %d, realh: %d\n", real_w, real_h);
-  printf("width: %d, height: %d\n", width, height);
+  // printf("realw: %d, realh: %d\n", real_w, real_h);
+  // printf("width: %d, height: %d\n", width, height);
   for(int row = y; row < height; row++)
   {
-    printf("OFF : %d\n", ((row + canvas_off_y) * screen_w + x + canvas_off_x) << 2);
+    // printf("OFF : %d\n", ((row + canvas_off_y) * screen_w + x + canvas_off_x) << 2);
     fseek(f_fb, ((row + canvas_off_y) * screen_w + x + canvas_off_x) << 2, SEEK_SET);
     fwrite(pixels + (row - y) * real_w, 1, width << 2, f_fb);
   }
