@@ -33,8 +33,8 @@ int NDL_PollEvent(char *buf, int len) {
 
 void NDL_OpenCanvas(int *w, int *h) {
   get_dispinfo();
-  // printf("screenw: %d, screenh: %d\n", screen_w, screen_h);
-  // printf("w: %d, h: %d\n", *w, *h);
+  printf("screenw: %d, screenh: %d\n", screen_w, screen_h);
+  printf("w: %d, h: %d\n", *w, *h);
   if(*w == 0 && *h == 0) {
     *w = screen_w;
     *h = screen_h;
@@ -43,7 +43,7 @@ void NDL_OpenCanvas(int *w, int *h) {
   canvas_h = *h < screen_h ? *h : screen_h;
   canvas_off_x = (screen_w - *w) >> 1;
   canvas_off_y = (screen_h - *h) >> 1;
-//   printf("offx: %d, offy: %d\n", canvas_off_x, canvas_off_y);
+  printf("offx: %d, offy: %d\n", canvas_off_x, canvas_off_y);
   if (getenv("NWM_APP")) {
     int fbctl = 4;
     fbdev = 5;
