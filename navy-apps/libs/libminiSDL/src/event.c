@@ -19,7 +19,7 @@ int SDL_PollEvent(SDL_Event *ev) {
   int ret = NDL_PollEvent(key, sizeof(key));
   if(ret == 0)
     return 0;
-  printf("event: %s\n", key);
+  // printf("event: %s\n", key);
   if(key[1] =='u')
     ev->type = SDL_KEYUP;
   else if(key[1] =='d')
@@ -30,7 +30,7 @@ int SDL_PollEvent(SDL_Event *ev) {
       break;
     }
   }
-  printf("event: %d, keyname[%d]: %s\n", ev->key.keysym.sym, ev->key.keysym.sym, keyname[ev->key.keysym.sym]);
+  // printf("event: %d, keyname[%d]: %s\n", ev->key.keysym.sym, ev->key.keysym.sym, keyname[ev->key.keysym.sym]);
   return 1;
 }
 
@@ -58,5 +58,6 @@ int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
 }
 
 uint8_t* SDL_GetKeyState(int *numkeys) {
+  printf("SDL_GetKeyState not implemented\n");
   return NULL;
 }
