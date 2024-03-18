@@ -19,7 +19,9 @@ int SDL_PollEvent(SDL_Event *ev) {
 
 int SDL_WaitEvent(SDL_Event *event) {
   char key[20] = {};
+  printf("waiting for event\n");
   while(!NDL_PollEvent(key, sizeof(key)));
+  printf("event: %s\n", key);
   if(key[1] =='u')
     event->type = SDL_KEYUP;
   else if(key[1] =='d')
