@@ -11,6 +11,7 @@ SDL_Surface* IMG_Load_RW(SDL_RWops *src, int freesrc) {
 }
 
 SDL_Surface* IMG_Load(const char *filename) {
+  printf("IMG_Load: %s\n", filename);
   FILE *f = fopen(filename, "rb");
   if(f == NULL)
     return NULL;
@@ -22,6 +23,7 @@ SDL_Surface* IMG_Load(const char *filename) {
   SDL_Surface *src = STBIMG_LoadFromMemory(buf, size);
   fclose(f);
   free(buf);
+  printf("IMG_Load: %s done\n", filename);
   return src;
 }
 
