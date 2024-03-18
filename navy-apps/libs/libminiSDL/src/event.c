@@ -32,6 +32,8 @@ int SDL_WaitEvent(SDL_Event *event) {
       break;
     }
   }
+  printf("keyname[0]: %s\n", keyname[0]);
+  printf("key+3: %s\n", key + 3);
   printf("event: %d\n", event->key.keysym.sym);
   return 1;
 }
