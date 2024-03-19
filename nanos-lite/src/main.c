@@ -13,10 +13,7 @@ int main() {
   Log("'Hello World!' from Nanos-lite");
   Log("Build time: %s, %s", __TIME__, __DATE__);
 
-
-//#ifdef HAS_VME
   init_mm();
-//#endif
 
   init_device();
 
@@ -31,9 +28,10 @@ int main() {
   init_proc();
 
   Log("Finish initialization");
-  
+
 #ifdef HAS_CTE
   yield();
 #endif
+
   panic("Should not reach here");
 }
