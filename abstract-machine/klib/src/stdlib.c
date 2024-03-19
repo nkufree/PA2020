@@ -6,6 +6,7 @@
 static unsigned long int next = 1;
 static char *addr = NULL;
 
+
 int rand(void) {
   // RAND_MAX assumed to be 32767
   next = next * 1103515245 + 12345;
@@ -29,6 +30,7 @@ int atoi(const char* nptr) {
   }
   return x;
 }
+
 
 void *malloc(size_t size) {
   if(addr == NULL)

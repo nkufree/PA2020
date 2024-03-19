@@ -1,5 +1,5 @@
 # Makefile for AbstractMachine Kernels and Libraries
-
+MAKEFLAGS += -j 8
 ### *Get a more readable version of this Makefile* by `make html` (requires python-markdown)
 html:
 	cat Makefile | sed 's/^\([^#]\)/    \1/g' | markdown_py > Makefile.html
@@ -87,7 +87,7 @@ ASFLAGS  += -MMD $(INCFLAGS)
 
 ## 4. Arch-Specific Configurations
 
-### Paste in arch-specific configurations (e.g., from `scripts/x86_64-qemu.mk`)
+### Paste in arch-specific configurations (e.g., from `am/arch/x86_64-qemu.mk`)
 -include $(AM_HOME)/scripts/$(ARCH).mk
 
 ## 5. Compilation Rules
