@@ -1,6 +1,5 @@
 #include <NDL.h>
 #include <stdlib.h>
-#include <string.h>
 
 uint8_t* keystate = NULL;
 
