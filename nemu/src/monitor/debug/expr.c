@@ -4,18 +4,16 @@
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
-#include <memory/paddr.h>
+
+#include "memory/paddr.h"
+
 enum {
-  TK_NOTYPE = 256, TK_EQ,
+  TK_NOTYPE = 256, TK_EQ=255, NUMBER=254,negative=253,
+  sixteen=252,reg=251,deref=250,and=249,neq=248,PC=257,
 
   /* TODO: Add more token types */
-	TK_AND, TK_NEQ, TK_G, TK_L, 
-  TK_HEXNUM, TK_NUM, TK_REG, 
-	TK_MINUS, // UNARY -
-	TK_DERE, // UNARY *
-};
 
-bool expr_valid = true;
+};
 
 static struct rule {
   char *regex;
@@ -25,27 +23,31 @@ static struct rule {
   /* TODO: Add more rules.
    * Pay attention to the precedence level of different rules.
    */
-
-  {"0x[0-9A-Fa-f]+", TK_HEXNUM},
-  {"[1-9][0-9]+|[0-9]", TK_NUM},
-  {"\\$[0-9a-zA-Z]+", TK_REG},
-  {"\\+", '+'},         // plus
-  {"\\(", '('},
-  {"\\)", ')'},
-  {"\\*", '*'},
-  {"/", '/'},
+  //被用于正则表达式编译，注意转义符号。
+  {"0x[0-9a-f]+",sixteen},//十六进制数，要先判断
   {" +", TK_NOTYPE},    // spaces
-  {"-", '-'},
+  {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
-	{"&&", TK_AND},
-	{"!=", TK_NEQ},
-  {">", TK_G},
-  {"<", TK_L},
+  {"\\-", '-'},           //sub
+  {"\\*",'*'},          //multiply
+  {"/",'/'},            //divide
+  {"[0-9]+",NUMBER},      //number
+  {"\\(",'('},          //左括号
+  {"\\)",')'},          //右括号
+// {"\\-[0-9]+",negative},
+  {"\\$\\p\\c",PC},
+  {"\\$[a-z]+",reg},
+  {"&&",and},
+  {"!=",neq},
+  
+  
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
 
 static regex_t re[NR_REGEX] = {};
+
+unsigned int calculate();
 
 /* Rules are used for many times.
  * Therefore we compile them only once before any usage.
@@ -63,31 +65,40 @@ void init_regex() {
     }
   }
 }
+//regcomp(regex_t *compiled,const char* pattern.int cflags) 
+//编译正则表达式。et为regcomp返回值，函数执行成功则返回0。 
+//这一部分编译完所有rules中的模式，存储在re[]中
 
 typedef struct token {
   int type;
   char str[32];
 } Token;
 
-static Token tokens[32] __attribute__((used)) = {};
+static Token tokens[500] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
+//make_token 用于识别待求值表达式的token
 static bool make_token(char *e) {
   int position = 0;
   int i;
   regmatch_t pmatch;
 
   nr_token = 0;
+  memset(tokens,0,sizeof(tokens));
 
-  while (e[position] != '\0') {
+  while (e[position] != '\0' && e[position]!='\n') 
+  {
     /* Try all rules one by one. */
-    for (i = 0; i < NR_REGEX; i ++) {
-      if (regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) {
-        char *substr_start = e + position;
-        int substr_len = pmatch.rm_eo;
+    for (i = 0; i < NR_REGEX; i ++) 
+    {
+      if (regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) 
+      {
+        //判断条件，成功匹配,且只返回第一个匹配到的token
+        char *substr_start = e + position; //匹配的字符串的起始位置
+        int substr_len = pmatch.rm_eo;    //匹配的字符串的终止位置
 
-        // Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
-        //     i, rules[i].regex, position, substr_len, substr_len, substr_start);
+        //Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
+        //   i, rules[i].regex, position, substr_len, substr_len, substr_start);
 
         position += substr_len;
 
@@ -95,27 +106,15 @@ static bool make_token(char *e) {
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
-
-        if(rules[i].token_type == TK_NOTYPE)
-					break;
-        if(substr_len > 31)
+        switch (rules[i].token_type) 
         {
-          Log("token len: %d is too long", substr_len);
-          return false;
-        }
-        tokens[nr_token].type = rules[i].token_type;
-        switch (rules[i].token_type) {
-          case TK_HEXNUM:
-          case TK_NUM:
-          case TK_REG:
-            strncpy(tokens[nr_token].str, substr_start, substr_len);
-            tokens[nr_token].str[substr_len] = '\0';
-            break;
+          case 256: break;
           default: 
+            tokens[nr_token].type=rules[i].token_type;
+            strncpy(tokens[nr_token].str,substr_start,substr_len);
+            nr_token++;
             break;
         }
-        nr_token++;
-
         break;
       }
     }
@@ -129,179 +128,6 @@ static bool make_token(char *e) {
   return true;
 }
 
-bool check_parentheses(int p, int q) {
-  int size = 0;
-  if(tokens[p].type != '(' || tokens[q].type != ')')
-    return false;
-  for(int i = p; i < q; i++)
-  {
-    if(tokens[i].type == '(') {
-      size++;
-    }
-    else if(tokens[i].type == ')') {
-      size--;
-      if(size < 0)
-      {
-        Log("error expr");
-        expr_valid = false;
-        return false;
-      }
-      else if(size == 0)
-        return false;
-    }
-  }
-  if(size != 1)
-  {
-    Log("error expr");
-    expr_valid = false;
-    return false;
-  }
-  return true;
-}
-
-int get_main_op_pos(int p, int q) {
-  int pos = -1;
-  int op_priority = -1;
-  bool in_parentheses = false;
-  for(int i = p; i < q + 1; i++)
-  {
-    switch(tokens[i].type)
-    {
-      case '(':
-        in_parentheses = true;
-        break;
-      case ')':
-        in_parentheses = false;
-        break;
-      case '+':
-      case '-':
-        if(in_parentheses)
-          break;
-				if(in_parentheses || op_priority > 2)
-          break;
-        pos = i;
-        op_priority = 2;
-        break;
-      case '*':
-      case '/':
-        if(in_parentheses || op_priority > 1)
-          break;
-        pos = i;
-        op_priority = 1;
-        break;
-			case TK_MINUS:
-			case TK_DERE:
-        // 单目运算符取第一个进行划分
-				if(in_parentheses || op_priority >= 0)
-          break;
-				pos = i;
-        op_priority = 0;
-        break;
-			case TK_EQ:
-			case TK_AND:
-			case TK_NEQ:
-      case TK_G:
-      case TK_L:
-				if(in_parentheses || op_priority > 3)
-          break;
-				pos = i;
-        op_priority = 3;
-        break;
-      default:
-        break;
-    }
-  }
-  return pos;
-}
-
-word_t eval(int p, int q) {
-  if(!expr_valid)
-    return 0;
-  if (p > q) {
-    /* Bad expression */
-    Log("error eval");
-    expr_valid = false;
-    return 0;
-  }
-  else if (p == q) {
-    /* Single token.
-     * For now this token should be a number.
-     * Return the value of the number.
-     */
-    Assert(tokens[p].type == TK_HEXNUM || tokens[p].type == TK_NUM || tokens[p].type == TK_REG, 
-    "error type of token %d, type is %d", p, tokens[p].type);
-    word_t num;
-    switch(tokens[p].type) {
-      case TK_HEXNUM:
-        sscanf(tokens[p].str, "0x%x", &num);
-        break;
-      case TK_NUM:
-        sscanf(tokens[p].str, "%d", &num);
-        break;
-      case TK_REG:
-        {
-          bool success;
-          num = isa_reg_str2val(tokens[p].str, &success);
-          if(!success)
-          {
-            Log("error reg");
-            return 0;
-          }
-        }
-        break;
-      default:
-        break;
-    }
-    return num;
-  }
-  else if (check_parentheses(p, q) == true) {
-    /* The expression is surrounded by a matched pair of parentheses.
-     * If that is the case, just throw away the parentheses.
-     */
-    return eval(p + 1, q - 1);
-  }
-  else {
-    /* We should do more things here. */
-    if(!expr_valid)
-      return 0;
-    int op = get_main_op_pos(p, q);
-		word_t val1;
-		if(tokens[op].type == TK_MINUS || tokens[op].type == TK_DERE)
-			val1 = 0;
-		else
-    	val1 = eval(p, op - 1);
-    word_t val2 = eval(op + 1, q);
-    switch (tokens[op].type)
-    {
-    case '+':
-      return val1 + val2;
-    case '-':
-      return val1 - val2;
-    case '*':
-      return val1 * val2;
-    case '/':
-      return val1 / val2;
-		case TK_MINUS:
-			return -val2;
-		case TK_DERE:
-			return paddr_read(val2, 4);
-		case TK_EQ:
-			return val1 == val2;
-		case TK_NEQ:
-			return val1 != val2;
-		case TK_AND:
-			return val1 && val2;
-    case TK_G:
-      return val1 > val2;
-    case TK_L:
-      return val1 < val2;
-    default:
-      Log("error expr");
-      expr_valid = false;
-      return 0;
-    }
-  }
-}
 
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -310,27 +136,424 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-  for(int i = 0; i < nr_token; i++)
-	{
-		int prev = i == 0 ? TK_NOTYPE : tokens[i - 1].type;
-		if(tokens[i].type == '-' || tokens[i].type == '*')
-		{
-			if(i == 0 || prev == '+' || prev == '-' 
-			|| prev == '*' || prev == '/' 
-			|| prev == '(' || prev == TK_MINUS || prev == TK_DERE)
-			{
-				if(tokens[i].type == '-')
-					tokens[i].type = TK_MINUS;
-				else if(tokens[i].type == '*')
-					tokens[i].type = TK_DERE;
-			}
-		}
-	}
+  for(int i = 0;i < nr_token;i++)
+  {
+    if(tokens[i].type=='-'&&(i==0||(tokens[i-1].type!=NUMBER&&tokens[i-1].type!=')')))
+    {
+      tokens[i].type=negative;
+      tokens[i].str[0]='-';
+    }
+    if(tokens[i].type=='*'&& (i == 0 || (tokens[i - 1].type != NUMBER &&tokens[i-1].type!=')')) )
+    {
+      tokens[i].type=deref;
+    }
+  }
 
-  word_t res = eval(0, nr_token - 1);
-  if(!expr_valid)
-    *success = false;
-  *success = true;
-
-  return res;
+  unsigned int ans=calculate(0,nr_token);
+  //printf("%u\n",ans);
+  
+  return ans;
 }
+//得到tokens后计算求值,并输出
+
+unsigned int calculate(int p,int q)
+{
+  if(p >= q)
+  {
+    printf("wrong");
+    return 0;
+  }
+  int count=p,num_of_stack=0,sign[100]={0},tmp=0,i=0;
+  unsigned int temp1=0,temp2=0,temp=0,stack[100]={0},val1=0,val2=0;
+  bool flag=true;
+  memset(sign,0,sizeof(sign));
+  memset(stack,0,sizeof(stack));
+  while(count < q)
+  {
+    count++;
+    switch(tokens[count-1].type)
+    {
+      case 257:
+          stack[num_of_stack++]=cpu.pc;
+          break;
+      case 253:
+          tmp=0;
+          for(i = count;i < q;i ++ )
+          {
+            if(tokens[i].type=='(')
+            {
+              tmp+=1;
+            }
+            else if(tokens[i].type==')')
+            {
+              tmp-=1;
+            }
+            if(tmp==0&&(tokens[i].type==NUMBER||tokens[i].type==')'))
+            {
+              tmp=i;
+              break;
+            }
+          }
+          temp=(-1U)*calculate(count,tmp+1);
+          tokens[tmp].type=NUMBER;
+          sprintf(tokens[tmp].str,"%u",temp);
+          count=tmp;
+          break;//处理非减法的-号
+      case 255:
+          tmp=0;
+          for(i = count;i < q;i ++ )
+          {
+            if(tokens[i].type=='(')
+            {
+              tmp+=1;
+            }
+            else if(tokens[i].type==')')
+            {
+              tmp-=1;
+            }
+            if(tmp==0)
+            {
+              tmp=i;
+              break;
+            }
+          }
+          if(i == q)
+              val2=calculate(count,q);
+          else val2=calculate(count,tmp+1);//等号右侧的值
+          
+          val1=stack[num_of_stack-1];//计算左侧的值
+          
+          stack[num_of_stack-1]=0;
+          if(val1==val2)
+            temp=1;
+          else temp=0;//比较结果
+          tokens[tmp].type=NUMBER;
+          sprintf(tokens[tmp].str,"%u",temp);
+          count=tmp;
+          num_of_stack--;
+          break;//equal //注意，等号左侧的值要么包裹在一对括号中，要么就是一个数，都只占一个stack，neq和and都一样。
+      case 248:
+          tmp=0;
+          for(i = count;i < q;i ++ )
+          {
+            if(tokens[i].type=='(')
+            {
+              tmp+=1;
+            }
+            else if(tokens[i].type==')')
+            {
+              tmp-=1;
+            }
+            if(tmp==0)
+            {
+              tmp=i;
+              break;
+            }
+          }
+          if(i == q)
+              val2=calculate(count,q);
+          else val2=calculate(count,tmp+1);//等号右侧的值
+          
+          val1=stack[num_of_stack-1];//计算左侧的值
+          
+          stack[num_of_stack-1]=0;
+          if(val1==val2)
+            temp=0;
+          else temp=1;//比较结果
+          tokens[tmp].type=NUMBER;
+          sprintf(tokens[tmp].str,"%u",temp);
+          count=tmp;
+          num_of_stack--;
+          break;//neq
+      case 249:
+          tmp=0;
+          for(i = count;i < q;i ++ )
+          {
+            if(tokens[i].type=='(')
+            {
+              tmp+=1;
+            }
+            else if(tokens[i].type==')')
+            {
+              tmp-=1;
+            }
+            if(tmp==0)
+            {
+              tmp=i;
+              break;
+            }
+          }
+          if(i == q)
+              val2=calculate(count,q);
+          else val2=calculate(count,tmp+1);//等号右侧的值
+          
+          val1=stack[num_of_stack-1];//计算左侧的值
+
+          stack[num_of_stack-1]=0;
+          temp=val1&&val2; //结果
+          tokens[tmp].type=NUMBER;
+          sprintf(tokens[tmp].str,"%u",temp);
+          count=tmp;
+          num_of_stack--;
+          break;//and
+      case 251:
+          flag=true;
+          stack[num_of_stack++]=isa_reg_str2val(tokens[count-1].str,&flag);
+          break;//寄存器的值
+      case 250:
+          tmp=0;
+          for(i = count;i < q;i ++ )
+          {
+            if(tokens[i].type=='(')
+            {
+              tmp+=1;
+            }
+            else if(tokens[i].type==')')
+            {
+              tmp-=1;
+            }
+            if(tmp==0)
+            {
+              tmp=i;
+              break;
+            }
+          }
+          if(i == q) temp=calculate(count,q);
+          else temp=calculate(count,tmp+1);
+          tokens[tmp].type=NUMBER;
+          sprintf(tokens[tmp].str,"%u",temp);
+          count=tmp;
+          break;//处理引用
+      case 256://空格不需要操作
+          break;
+      case '+':
+          stack[num_of_stack++]='+';
+          sign[num_of_stack-1]='+';//加法压入栈
+          break;
+      case '-'://减法压入栈
+          stack[num_of_stack++]='-';
+          sign[num_of_stack-1]='-';
+          break; 
+      case '*'://乘法压入栈
+          stack[num_of_stack++]='*';
+          sign[num_of_stack-1]='*';
+          break;
+      case '/'://除法压入栈
+          stack[num_of_stack++]='/';
+          sign[num_of_stack-1]='/';
+          break;
+      case 252:
+          if(num_of_stack == 0)  
+            {
+              sscanf(tokens[count-1].str,"%x", &temp);
+              stack[num_of_stack++]=temp;
+              break;
+            }
+            num_of_stack-=1;
+          if(sign[num_of_stack]=='*'||sign[num_of_stack]=='/')
+          {
+            temp1=stack[num_of_stack-1];
+            sscanf(tokens[count-1].str,"%x", &temp2);
+            if(sign[num_of_stack]=='*')
+            {
+              temp1=temp1*temp2;
+            }
+            else{
+              if(temp2==0)
+              {
+                printf("divided by 0\n");
+                return 0;
+              }
+              temp1=temp1/temp2;
+            }
+            stack[num_of_stack-1]=temp1;
+            sign[num_of_stack]=0;
+            stack[num_of_stack]=0;
+          }
+          else{
+            sscanf(tokens[count-1].str,"%u", &temp);
+            stack[num_of_stack+1]=temp;
+            num_of_stack+=2;
+          }
+          break;//遇到数字处理乘法和除法
+      case 254:
+          if(num_of_stack == 0)  
+            {
+              sscanf(tokens[count-1].str,"%u", &temp);
+              stack[num_of_stack++]=temp;
+              break;
+            }
+            num_of_stack-=1;
+          if(sign[num_of_stack]=='*'||sign[num_of_stack]=='/')
+          {
+            temp1=stack[num_of_stack-1];
+            sscanf(tokens[count-1].str,"%u", &temp2);
+            if(sign[num_of_stack]=='*')
+            {
+              temp1=temp1*temp2;
+            }
+            else{
+              if(temp2==0)
+              {
+                printf("divided by 0\n");
+                return 0;
+              }
+              temp1=temp1/temp2;
+            }
+            stack[num_of_stack-1]=temp1;
+            sign[num_of_stack]=0;
+            stack[num_of_stack]=0;
+          }
+          else{
+            sscanf(tokens[count-1].str,"%u", &temp);
+            stack[num_of_stack+1]=temp;
+            num_of_stack+=2;
+          }
+          break;//遇到数字处理乘法和除法
+      case '(':
+          stack[num_of_stack++]='(';
+          sign[num_of_stack-1]='(';
+          break;
+      case ')':
+          temp=0;
+          num_of_stack-=1;
+          while(sign[num_of_stack]!='(')
+          {
+            switch(sign[num_of_stack])
+            {
+              case '-':
+                if(stack[num_of_stack-2]!='(' && sign[num_of_stack-2]==sign[num_of_stack])
+              {
+                temp=stack[num_of_stack-1]+temp;
+                sign[num_of_stack]=0;
+                stack[num_of_stack]=0;
+                stack[num_of_stack-1]=temp;
+              }     
+                else if(stack[num_of_stack-2]!='('){
+                temp=stack[num_of_stack-1]-temp;
+                sign[num_of_stack]=0;
+                stack[num_of_stack]=0;
+                stack[num_of_stack-1]=temp;
+              }
+                else{
+                temp=stack[num_of_stack-1]-temp;
+                stack[num_of_stack-1]=temp;
+              }
+                sign[num_of_stack]=0;
+                num_of_stack--;
+                break;
+              case '+':
+                if(stack[num_of_stack-2]!='(' && sign[num_of_stack-2]==sign[num_of_stack])
+                {
+                  temp=stack[num_of_stack-1]+temp;
+                  sign[num_of_stack]=0;
+                  stack[num_of_stack]=0;
+                  stack[num_of_stack-1]=temp;
+                }
+                else if(stack[num_of_stack-2]!='(')
+                {
+                  temp=stack[num_of_stack-1]-temp;
+                  sign[num_of_stack]=0;
+                  stack[num_of_stack]=0;
+                  stack[num_of_stack-1]=temp;
+                }
+                else{
+                  temp=stack[num_of_stack-1]+temp;
+                  stack[num_of_stack-1]=temp;
+                }
+                sign[num_of_stack]=0;
+                num_of_stack--;
+                break;
+              default:
+                temp=stack[num_of_stack];
+                stack[num_of_stack]=0;
+                num_of_stack--;
+            }
+          }//括号里只有加减法，计算结果
+          sign[num_of_stack]=0;
+          count-=1;
+          tokens[count].type=254;
+          sprintf(tokens[count].str,"%u",temp); //把得到的值再次进行判断，处理a*(b+c)的情况
+          break;   
+      default:assert(0);
+    }
+  } //将所有的值的压入栈中。其中计算处理了括号中的数和乘除法
+  temp=stack[--num_of_stack];
+  while( num_of_stack > 0)
+  {
+    switch(sign[num_of_stack])
+    {
+      case '-':
+        if(num_of_stack > 2 && sign[num_of_stack-2]==sign[num_of_stack])
+        {
+          temp=stack[num_of_stack-1]+temp;
+          sign[num_of_stack]=0;
+          stack[num_of_stack]=0;
+          stack[num_of_stack-1]=temp;
+        }
+        else if(num_of_stack >2){
+          temp=stack[num_of_stack-1]-temp;
+          sign[num_of_stack]=0;
+          stack[num_of_stack]=0;
+          stack[num_of_stack-1]=temp;
+        }
+        else{
+          temp=stack[num_of_stack-1]-temp;
+          stack[num_of_stack-1]=temp;
+        }
+        num_of_stack--;
+        break;
+      case '+':
+        if(num_of_stack > 2 && sign[num_of_stack-2]==sign[num_of_stack])
+        {
+          temp=stack[num_of_stack-1]+temp;
+          sign[num_of_stack]=0;
+          stack[num_of_stack]=0;
+          stack[num_of_stack-1]=temp;
+        }
+        else if(num_of_stack >2)
+        {
+          temp=stack[num_of_stack-1]-temp;
+          sign[num_of_stack]=0;
+          stack[num_of_stack]=0;
+          stack[num_of_stack-1]=temp;
+        }
+        else{
+          temp=stack[num_of_stack-1]+temp;
+          stack[num_of_stack-1]=temp;
+        }
+        num_of_stack--;
+        break;
+      default:
+        temp=stack[num_of_stack];
+        stack[num_of_stack]=0;
+        num_of_stack--;
+    }
+  }//只有加减法的运算且无括号
+  return temp;
+}
+
+
+/*
+u_int32_t eval(int p,int q)
+{
+  u_int32_t temp=0,op,val1,val2;
+  if(p > q)
+  {
+    printf("wrong!\n");
+    return 0;
+  }
+  else if(p==q)
+  {
+    sscanf(tokens[p].str,"%u",&temp);
+    return temp;
+  }
+  else if(check_parentheses(p,q)==true)
+  {
+    return eval(p+1,q-1);
+  }
+  else{
+
+  }
+}
+*/
