@@ -73,9 +73,9 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   PageMap *vm_head = as->ptr;
   assert(vm_head != NULL);
   list_foreach(pp, vm_head) {
-    //printf("%p %p\n",pp->va,va);
     if (pp->va == va) break;
   }
+
   if (pp == NULL) {
     pp = pgalloc(__am_pgsize); // this will waste memory, any better idea?
   }

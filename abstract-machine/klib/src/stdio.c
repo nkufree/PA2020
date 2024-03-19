@@ -5,155 +5,182 @@
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
-int printf(const char *fmt, ...)
-{
-  char ans[2000]={0};
+enum {FMT_USUAL, FMT_S, FMT_D};
+
+typedef struct {
+  const char* fmt;
   va_list ap;
-  int ret = 0;
-  va_start(ap, fmt);
-  ret = vsprintf(ans, fmt, ap);
-  va_end(ap);
-  for(int i = 0; ans[i] != '\0';i++)
+  int state;
+  bool end;
+  char helpd[20];
+  int helplen;
+  char* helps;
+  int total_len;
+} fmt_parser;
+
+static void itora(int num, char* s, int* len, int base)
+{
+  bool minus = num < 0;
+  if(minus)
+    num = -num;
+  if(num == 0)
   {
-    putch(ans[i]);
+    s[0] = '0';
+    s[1] = '\0';
+    *len = 1;
+    return;
   }
-  return ret;
+  int curr_len = 0;
+  int tmp;
+  while (num != 0)
+  {
+    tmp = num % base;
+    num = num / base;
+    if(base == 10)
+      s[curr_len] = tmp + '0';
+    else if(base == 16)
+    {
+      if(tmp < 10)
+        s[curr_len] = tmp + '0';
+      else
+        s[curr_len] = tmp - 10 + 'a';
+    }
+    curr_len++;
+  }
+  if(minus)
+  {
+    s[curr_len] = '-';
+    curr_len++;
+  }
+  s[curr_len] = '\0';
+  *len = curr_len;
 }
 
-int vsprintf(char *out, const char *fmt, va_list ap)
+static char get_char(fmt_parser* fmtp)
 {
-  size_t j = 0, k = 0 ,i = 0;
-  int val, num[64] = {0};
-  uint32_t v;
-  const char* str;
-  char nums[20];
-  while (*fmt != '\0')
+  if(fmtp->end)
+    return 0;
+  fmtp->total_len += 1;
+repeat:
+  switch(fmtp->state)
   {
-    switch (*fmt)
-    {
-    case '%':
-      //精度,中间还没留精度的选项
-      fmt++;
-      if (*fmt >= 'a' && *fmt <= 'z')
+    case FMT_USUAL:
+      ;char ch = *(fmtp->fmt);
+      if(ch == '\0')
       {
-        switch (*fmt)
+        fmtp->end = true;
+        fmtp->total_len -= 1;
+        return 0;
+      }
+      else if(ch == '%')
+      {
+        fmtp->fmt++;
+        switch(*(fmtp->fmt))
         {
+          case 'c': 
+            fmtp->fmt++;
+            return va_arg(fmtp->ap, int);
           case 'd':
-            val = va_arg(ap, int);
-            k = 0;
-            if (val == 0x80000000)
-            {
-              out[j++] = '-';out[j++] = '2';out[j++] = '1';out[j++] = '4';out[j++] = '7';out[j++] = '4';
-              out[j++] = '8';out[j++] = '3';out[j++] = '6';out[j++] = '4';out[j++] = '8';
-              fmt++;
-              break;
-            }
-            else if (val < 0)
-            {
-              val = (-1) * val;
-              out[j++] = '-';
-            }
-            do
-            {
-              num[k++] = val % 10 + '0';
-              val = val / 10;
-            } while (val != 0);
-            for (int ii = k - 1; ii >= 0; ii--)
-            {
-              out[j++] = num[ii];
-            }
-            fmt++;
+            fmtp->fmt++;
+            fmtp->state = FMT_D;
+            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 10);
             break;
           case 's':
-            str = va_arg(ap, char *);
-            i= 0;
-            while(str[i] != '\0')
-            {
-              out[j++] = str[i++];
-            }
-            fmt++;
-            break;  
-          case 'x':  
-            v = va_arg(ap,uint32_t);
-            k = 0;
-            out[j++]='0';
-            out[j++]='x';
-            if(v == 0){
-                out[j++] = '0';
-                fmt++;
-                break;
-            }
-            while(v != 0)
-            {
-              nums[k++] = v%16 < 10? v%16+'0':'a'+v%16-10;
-              v = v/16;
-            }
-            for(int ii=k-1;ii>=0;ii--){
-              out[j++]=nums[ii];
-            }
-            fmt++;
-            break; 
-          case 'p':
-            v = va_arg(ap,uint32_t);
-            k = 0;
-            out[j++]='0';
-            out[j++]='x';
-            if(v == 0){
-              out[j++] = '0';
-              fmt++;
-              break;
-            }
-            while(v != 0)
-            {
-              nums[k++] = v%16 < 10? v%16+'0':'a'+v%16-10;
-              v = v/16;
-            }
-            for(int ii=k-1;ii>=0;ii--){
-              out[j++]=nums[ii];
-            }
-            fmt++;
+            fmtp->fmt++;
+            fmtp->state = FMT_S;
+            fmtp->helplen = -1;
+            fmtp->helps = va_arg(fmtp->ap, char*);
+            if(fmtp->helps[0] == '\0')
+              fmtp->state = FMT_USUAL;
             break;
-          case 'c':
-            out[j++] = va_arg(ap,int);
-            fmt++;
-            break;  
-          default:
-            assert(0);
-          //other fuctions remaining to be realized.
+          case 'x':
+            fmtp->fmt++;
+            fmtp->state = FMT_D;
+            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 16);
+            break;
+          case 'p':
+            fmtp->fmt++;
+            fmtp->state = FMT_D;
+            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 16);
+            while(fmtp->helplen < sizeof(uintptr_t) * 2)
+            {
+              fmtp->helpd[fmtp->helplen] = '0';
+              fmtp->helplen++;
+            }
+            fmtp->helpd[fmtp->helplen] = 'x';
+            fmtp->helpd[fmtp->helplen + 1] = '0';
+            fmtp->helplen+=2;
+            break;
         }
-      } //处理标志符及一个字母中间的数
-      else{
-        out[j++] = *fmt;
-        fmt++;
+        goto repeat;
+      }
+      else
+      {
+        fmtp->fmt++;
+        return ch;
       }
       break;
-    default:
-      out[j++] = *fmt;
-      fmt++;
-    }
+    case FMT_D:
+      fmtp->helplen --;
+      if(fmtp->helplen == 0)
+        fmtp->state = FMT_USUAL;
+      return fmtp->helpd[fmtp->helplen];
+    case FMT_S:
+      fmtp->helplen++;
+      if(fmtp->helps[fmtp->helplen + 1] == '\0')
+        fmtp->state = FMT_USUAL;
+      return fmtp->helps[fmtp->helplen];
   }
-  out[j] = '\0';
-  return j;
+  return 0;
 }
 
-int sprintf(char *out, const char *fmt, ...)
-{
+int printf(const char *fmt, ...) {
   va_list ap;
-  int ret = 0;
   va_start(ap, fmt);
-  ret = vsprintf(out, fmt, ap);
+  fmt_parser fmtp = {fmt, ap, false};
+  while (!fmtp.end)
+  {
+    char ch = get_char(&fmtp);
+    putch(ch);
+  }
+  va_end(ap);
+  return fmtp.total_len;
+}
+
+int vsprintf(char *out, const char *fmt, va_list ap) {
+  fmt_parser fmtp = {fmt, ap, false, .total_len=0};
+  while (!fmtp.end)
+  {
+    *out = get_char(&fmtp);
+    out++;
+  }
+  return fmtp.total_len;
+}
+
+int sprintf(char *out, const char *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  int ret = vsprintf(out, fmt, ap);
   va_end(ap);
   return ret;
 }
 
-int snprintf(char *out, size_t n, const char *fmt, ...)
-{
-  return 0;
+int snprintf(char *out, size_t n, const char *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  int ret = vsnprintf(out, n, fmt, ap);
+  va_end(ap);
+  return ret;
 }
 
-int vsnprintf(char *out, size_t n, const char *fmt, va_list ap)
-{
-  return 0;
+int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
+  fmt_parser fmtp = {fmt, ap, false, .total_len=0};
+  while (!fmtp.end && fmtp.total_len < n)
+  {
+    *out = get_char(&fmtp);
+    out++;
+  }
+  return fmtp.total_len;
 }
 
 #endif

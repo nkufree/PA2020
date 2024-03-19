@@ -3,7 +3,7 @@
 
 /* Uncomment these macros to enable corresponding functionality. */
 #define HAS_CTE
-//#define HAS_VME
+#define HAS_VME    //开启虚存
 //#define MULTIPROGRAM
 //#define TIME_SHARING
 
