@@ -47,13 +47,18 @@ int SDL_WaitEvent(SDL_Event *event) {
   // printf("waiting for event\n");
   while(!NDL_PollEvent(key, sizeof(key)));
   // printf("event: %s\n", key);
-  if(key[1] =='u')
+  if(key[1] =='u') {
+    key_num--;
     event->type = SDL_KEYUP;
-  else if(key[1] =='d')
+  }
+  else if(key[1] =='d') {
+    key_num++;
     event->type = SDL_KEYDOWN;
+  }
   for(int i = 0; i < sizeof(keyname) / sizeof(keyname[0]); i++) {
     if(strncmp(keyname[i], key + 3, strlen(key + 3)) == 0 && strlen(keyname[i]) == strlen(key + 3)) {
       event->key.keysym.sym = i;
+      keystate[i] = key[1] == 'd' ? 1 : 0;
       break;
     }
   }
