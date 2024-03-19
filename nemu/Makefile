@@ -1,7 +1,5 @@
 NAME = nemu
 
-MAKEFLAGS += -j 8
-
 ISA ?= x86
 ISAS = $(shell ls src/isa/)
 ifeq ($(filter $(ISAS), $(ISA)), ) # ISA must be valid
@@ -120,8 +118,3 @@ clean:
 	$(MAKE) -C tools/gen-expr clean
 	$(MAKE) -C tools/qemu-diff clean
 	$(MAKE) -C tools/kvm-diff clean
-
-
-
-
-
