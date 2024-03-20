@@ -72,13 +72,13 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
   void* ret = (void*)(uintptr_t)heap.end;
   ret -= argvlen + envplen + (argc + envc + 2) * sizeof(char*) + sizeof(int) + 12;
   *((int*)ret) = argc;
-  char* argvp = ret + sizeof(int);
+  char** argvp = ret + sizeof(int);
   char* string_area = ret + sizeof(int) + (argc + envc + 2) * sizeof(char*);
   printf("ret: %p, argvp: %p, string_area: %p\n", ret, argvp, string_area);
   for(int i = 0; i < argc; i++)
   {
     strcpy(string_area, argv[i]);
-    argvp = string_area;
+    *argvp = string_area;
     argvp++;
     string_area += strlen(argv[i]) + 1;
   }
@@ -86,7 +86,7 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
   for(int i = 0; i < envc; i++)
   {
     strcpy(string_area, envp[i]);
-    argvp = string_area;
+    *argvp = string_area;
     argvp++;
     string_area += strlen(envp[i]) + 1;
   }
