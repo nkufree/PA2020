@@ -32,7 +32,6 @@ void init_proc() {
   int32_t* a = malloc(sizeof(int32_t)), *b = malloc(sizeof(int32_t));
   *a = 0;
   *b = 1;
-  printf("a: %p, b: %p\n", a, b);
   context_kload(&pcb[0], hello_fun, (void*)a);
   context_uload(&pcb[1], "/bin/pal");
   switch_boot_pcb();
