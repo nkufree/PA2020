@@ -58,14 +58,12 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
   // 解析参数和环境变量
   int argc = 0, envc = 0;
   int argvlen = 0, envplen = 0;
-  while(argv[argc] != NULL)
+  while(argv != NULL && argv[argc] != NULL)
   {
-    printf("argc: %d, argv: %s\n", argc, argv[argc]);
     argvlen += strlen(argv[argc]) + 1;
     argc++;
   }
-  printf("argc: %d, envc: %d\n", argc, envc);
-  while(envp[envc] != NULL)
+  while(envp != NULL && envp[envc] != NULL)
   {
     envplen += strlen(envp[envc]) + 1;
     envc++;
