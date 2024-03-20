@@ -15,6 +15,7 @@ size_t fs_read(int fd, void *buf, size_t len);
 size_t fs_write(int fd, const void *buf, size_t len);
 size_t fs_lseek(int fd, size_t offset, int whence);
 int fs_close(int fd);
+Context* ucontext(AddrSpace *as, Area kstack, void *entry);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   int fd = fs_open(filename, 0, 0);
@@ -53,3 +54,8 @@ void naive_uload(PCB *pcb, const char *filename) {
   ((void(*)())entry) ();
 }
 
+void context_uload(PCB* pcb, const char *filename) {
+  uintptr_t entry = loader(pcb, filename);
+  pcb->cp = ucontext(NULL, (Area) { pcb->stack, pcb->stack + STACK_SIZE }, (void*)entry);
+  pcb->cp->GPRx = (uintptr_t)heap.end;
+}

@@ -8,6 +8,7 @@ static PCB pcb_boot = {};
 PCB *current = NULL;
 
 void naive_uload(PCB *pcb, const char *filename);
+void context_uload(PCB* pcb,char *filename);
 
 void context_kload(PCB* pcb, void (*entry)(void *), void *arg) {
   pcb->cp = kcontext((Area) { pcb->stack, pcb->stack + STACK_SIZE }, entry, arg);
@@ -33,7 +34,7 @@ void init_proc() {
   *b = 1;
   printf("a: %p, b: %p\n", a, b);
   context_kload(&pcb[0], hello_fun, (void*)a);
-  context_kload(&pcb[1], hello_fun, (void*)b);
+  context_uload(&pcb[1], "/bin/pal");
   switch_boot_pcb();
 
   Log("Initializing processes...");
