@@ -64,12 +64,12 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
     argvlen += strlen(argv[argc]) + 1;
     argc++;
   }
+  printf("argc: %d, envc: %d\n", argc, envc);
   while(envp[envc] != NULL)
   {
     envplen += strlen(envp[envc]) + 1;
     envc++;
   }
-  printf("argc: %d, envc: %d\n", argc, envc);
   void* ret = (void*)(uintptr_t)heap.end;
   ret -= argvlen + envplen + (argc + envc + 2) * sizeof(char*) + sizeof(int) + 12;
   *((int*)ret) = argc;
