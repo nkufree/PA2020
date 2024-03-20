@@ -55,7 +55,38 @@ void naive_uload(PCB *pcb, const char *filename) {
 }
 
 void context_uload(PCB* pcb, const char *filename, char *const argv[], char *const envp[]) {
+  // 解析参数和环境变量
+  int argc = 0, envc = 0;
+  int argvlen = 0, envplen = 0;
+  while(argv[argc] != NULL)
+  {
+    argvlen += strlen(argv[argc]) + 1;
+    argc++;
+  }
+  while(envp[envc] != NULL)
+  {
+    envplen += strlen(envp[envc]) + 1;
+    envc++;
+  }
+  void* ret = (void*)(uintptr_t)heap.end;
+  ret -= argvlen + envplen + (argc + envc + 2) * sizeof(char*) + sizeof(int) + 12;
+  *((int*)ret) = argc;
+  char* argvp = ret + sizeof(int);
+  char* string_area = ret + sizeof(int) + (argc + envc + 2) * sizeof(char*);
+  for(int i = 0; i < argc; i++)
+  {
+    strcpy(string_area, argvp);
+    argvp++;
+    string_area += strlen(argvp) + 1;
+  }
+  argvp++;
+  for(int i = 0; i < envc; i++)
+  {
+    strcpy(string_area, argvp);
+    argvp++;
+    string_area += strlen(argvp) + 1;
+  }
   uintptr_t entry = loader(pcb, filename);
   pcb->cp = ucontext(NULL, (Area) { pcb->stack, pcb->stack + STACK_SIZE }, (void*)entry);
-  pcb->cp->GPRx = (uintptr_t)heap.end;
+  pcb->cp->GPRx = (uintptr_t)ret;
 }
