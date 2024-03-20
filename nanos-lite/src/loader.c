@@ -60,6 +60,7 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
   int argvlen = 0, envplen = 0;
   while(argv[argc] != NULL)
   {
+    printf("argc: %d, argv: %s\n", argc, argv[argc]);
     argvlen += strlen(argv[argc]) + 1;
     argc++;
   }
