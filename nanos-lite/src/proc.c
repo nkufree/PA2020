@@ -27,7 +27,11 @@ void hello_fun(void *arg) {
 }
 
 void init_proc() {
-  context_kload(&pcb[0], hello_fun, NULL);
+  int32_t* a = malloc(sizeof(int32_t)), *b = malloc(sizeof(int32_t));
+  *a = 0;
+  *b = 1;
+  context_kload(&pcb[0], hello_fun, (void*)a);
+  context_kload(&pcb[1], hello_fun, (void*)b);
   switch_boot_pcb();
 
   Log("Initializing processes...");
@@ -39,6 +43,6 @@ void init_proc() {
 
 Context* schedule(Context *prev) {
   current->cp = prev;
-  current = &pcb[0];
+  current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
   return current->cp;
 }

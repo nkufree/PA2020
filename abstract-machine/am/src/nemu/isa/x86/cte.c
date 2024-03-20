@@ -56,7 +56,8 @@ bool cte_init(Context*(*handler)(Event, Context*)) {
 
 
 Context* kcontext(Area kstack, void (*entry)(void *), void *arg) {
-  Context* c = (Context*)(kstack.end - sizeof(Context));
+  *((uint32_t*)(uintptr_t)kstack.end) = (uintptr_t)arg;
+  Context* c = (Context*)(kstack.end - sizeof(Context) - sizeof(uintptr_t));
   memset(c, 0, sizeof(Context));
   c->cs = 8;
   c->eflags = 0x2;
