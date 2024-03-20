@@ -9,7 +9,7 @@ void call_main(uintptr_t *args) {
   char **argv = (char **)(args + 1);
   char **envp = argv + argc + 1;
   // environ = empty;
-  printf("argc: %d\n", argc);
+  // printf("argc: %d\n", argc);
   exit(main(argc, argv, envp));
   assert(0);
 }

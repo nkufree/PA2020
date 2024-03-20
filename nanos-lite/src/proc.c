@@ -29,6 +29,10 @@ void hello_fun(void *arg) {
   }
 }
 
+void execve(const char *filename, char *const argv[], char *const envp[]) {
+  context_uload(current, filename, argv, envp);
+}
+
 void init_proc() {
   Log("Initializing processes...");
   int32_t* a = malloc(sizeof(int32_t)), *b = malloc(sizeof(int32_t));

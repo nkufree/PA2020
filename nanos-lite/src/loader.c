@@ -16,6 +16,7 @@ size_t fs_write(int fd, const void *buf, size_t len);
 size_t fs_lseek(int fd, size_t offset, int whence);
 int fs_close(int fd);
 Context* ucontext(AddrSpace *as, Area kstack, void *entry);
+void* new_page(size_t nr_page);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   int fd = fs_open(filename, 0, 0);
@@ -68,13 +69,13 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
     envplen += strlen(envp[envc]) + 1;
     envc++;
   }
-  printf("argc: %d, envc: %d\n", argc, envc);
-  void* ret = (void*)(uintptr_t)heap.end;
+  // printf("argc: %d, envc: %d\n", argc, envc);
+  void* ret = new_page(4);
   ret -= argvlen + envplen + (argc + envc + 2) * sizeof(char*) + sizeof(int) + 12;
   *((int*)ret) = argc;
   char** argvp = ret + sizeof(int);
   char* string_area = ret + sizeof(int) + (argc + envc + 2) * sizeof(char*);
-  printf("ret: %p, argvp: %p, string_area: %p\n", ret, argvp, string_area);
+  // printf("ret: %p, argvp: %p, string_area: %p\n", ret, argvp, string_area);
   for(int i = 0; i < argc; i++)
   {
     strcpy(string_area, argv[i]);
