@@ -39,8 +39,8 @@ void init_proc() {
   *a = 0;
   *b = 1;
   context_kload(&pcb[0], hello_fun, (void*)a);
-  char* argv[] = {"--skip", "--test", NULL};
-  context_uload(&pcb[1], "/bin/exec-test", argv, NULL);
+  // char* argv[] = {"--skip", "--test", NULL};
+  context_uload(&pcb[1], "/bin/exec-test", NULL, NULL);
   switch_boot_pcb();
 
 
