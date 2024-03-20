@@ -30,6 +30,7 @@ void hello_fun(void *arg) {
 }
 
 void init_proc() {
+  Log("Initializing processes...");
   int32_t* a = malloc(sizeof(int32_t)), *b = malloc(sizeof(int32_t));
   *a = 0;
   *b = 1;
@@ -38,7 +39,6 @@ void init_proc() {
   context_uload(&pcb[1], "/bin/pal", argv, NULL);
   switch_boot_pcb();
 
-  Log("Initializing processes...");
 
   // load program here
   // naive_uload(NULL, "/bin/bird");
