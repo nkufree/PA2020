@@ -62,7 +62,7 @@ Context* kcontext(Area kstack, void (*entry)(void *), void *arg) {
   c->eflags = 0x2;
   c->eip = (uintptr_t)entry;
   c->ebp = (uintptr_t)kstack.end;
-  c->esp = (uintptr_t)c;
+  c->esp = (uintptr_t)&c->eip;
   return c;
 }
 
