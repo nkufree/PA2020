@@ -50,7 +50,7 @@ void init_proc() {
   *b = 1;
   context_kload(&pcb[0], hello_fun, (void*)a);
   char* argv[] = {NULL};
-  context_uload(&pcb[1], "/bin/nterm", argv, NULL);
+  context_uload(&pcb[1], "/bin/nslider", argv, NULL);
   switch_boot_pcb();
 
 
