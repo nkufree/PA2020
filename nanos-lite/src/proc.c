@@ -9,6 +9,7 @@ PCB *current = NULL;
 
 void naive_uload(PCB *pcb, const char *filename);
 void context_uload(PCB* pcb, const char *filename, char *const argv[], char *const envp[]);
+int fs_open(const char *pathname, int flags, int mode);
 
 void context_kload(PCB* pcb, void (*entry)(void *), void *arg) {
   pcb->cp = kcontext((Area) { pcb->stack, pcb->stack + STACK_SIZE }, entry, arg);
@@ -29,8 +30,17 @@ void hello_fun(void *arg) {
   }
 }
 
-void execve(const char *filename, char *const argv[], char *const envp[]) {
+int execve(const char *filename, char *const argv[], char *const envp[]) {
+  int fd = fs_open(filename, 0, 0);
+  if(fd == -1)
+  {
+    printf("execve: file not found\n");
+    return -2;
+  }
   context_uload(current, filename, argv, envp);
+  switch_boot_pcb();
+  yield();
+  return 0;
 }
 
 void init_proc() {
