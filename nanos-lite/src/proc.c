@@ -18,9 +18,10 @@ void switch_boot_pcb() {
 }
 
 void hello_fun(void *arg) {
+  int a = *(uint32_t*)arg;
   int j = 1;
   while (1) {
-    Log("Hello World from Nanos-lite with arg '%p' for the %dth time!", (uintptr_t)arg, j);
+    Log("Hello World from Nanos-lite with arg '%p'=%d for the %dth time!", (uintptr_t)arg, a, j);
     j ++;
     yield();
   }
@@ -30,6 +31,7 @@ void init_proc() {
   int32_t* a = malloc(sizeof(int32_t)), *b = malloc(sizeof(int32_t));
   *a = 0;
   *b = 1;
+  printf("a: %p, b: %p\n", a, b);
   context_kload(&pcb[0], hello_fun, (void*)a);
   context_kload(&pcb[1], hello_fun, (void*)b);
   switch_boot_pcb();
