@@ -1,12 +1,13 @@
 #include <common.h>
 
 void do_syscall(Context *c);
+Context* schedule(Context *prev);
 
 static Context* do_event(Event e, Context* c) {
   // printf("eip: %d\n", c->eip);
   switch (e.event) {
     case EVENT_SYSCALL: do_syscall(c); break;
-    case EVENT_YIELD: printf("trap at yield\n"); break;
+    case EVENT_YIELD: schedule(c); break;
     default: panic("Unhandled event ID = %d", e.event);
   }
 
