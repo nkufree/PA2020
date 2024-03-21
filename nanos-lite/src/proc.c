@@ -50,12 +50,12 @@ void init_proc() {
   *b = 1;
   context_kload(&pcb[0], hello_fun, (void*)a);
 //   char* argv[] = {"/bin/busybox", "cat", "/share/games/bird/atlas.txt", NULL};
-//   context_uload(&pcb[1], "/bin/busybox", argv, NULL);
+  context_uload(&pcb[1], "/bin/nterm", NULL, NULL);
   switch_boot_pcb();
 
 
   // load program here
-  naive_uload(NULL, "/bin/busybox");
+//   naive_uload(NULL, "/bin/busybox");
 
 }
 
