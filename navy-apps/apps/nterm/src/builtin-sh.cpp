@@ -23,6 +23,36 @@ static void sh_prompt() {
 }
 
 static void sh_handle_cmd(const char *cmd) {
+  char* argv[16] = {NULL};
+  int argc = 0;
+  const char* start = cmd;
+  int len = 0;
+  while (*cmd)
+  {
+    if(*cmd == ' ' || *cmd == '\n')
+    {
+      if(len == 0)
+        continue;
+      argv[argc] = (char*)malloc(len + 1);
+      memcpy(argv[argc], start, len);
+      argv[argc][len] = '\0';
+      argc++;
+      len = 0;
+      cmd++;
+      start = cmd;
+      if(argc == 16)
+      {
+        printf("Too many arguments\n");
+        return;
+      }
+      continue;
+    }
+    cmd++;
+    len++;
+  }
+  argv[argc] = NULL;
+  char* envp[] = {"/bin", "/usr/bin"};
+  execve("/bin/busybox", argv, envp);
 }
 
 void builtin_sh_run() {
