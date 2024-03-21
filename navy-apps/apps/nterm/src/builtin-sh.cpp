@@ -60,7 +60,7 @@ static void sh_handle_cmd(const char *cmd) {
   }
 
   char* envp[] = {"/bin", "/usr/bin"};
-  execve("/bin/busybox", argv, envp);
+  execve(argv[0], argv, envp);
 }
 
 void builtin_sh_run() {
