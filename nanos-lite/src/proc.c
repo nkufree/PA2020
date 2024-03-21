@@ -49,8 +49,8 @@ void init_proc() {
   *a = 0;
   *b = 1;
   context_kload(&pcb[0], hello_fun, (void*)a);
-  char* argv[] = {NULL};
-  context_uload(&pcb[1], "/bin/nterm", argv, NULL);
+//   char* argv[] = {NULL};
+  context_uload(&pcb[1], "/bin/nterm", NULL, NULL);
   switch_boot_pcb();
 
 
