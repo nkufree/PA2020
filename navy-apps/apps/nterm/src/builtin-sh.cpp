@@ -60,8 +60,8 @@ static void sh_handle_cmd(const char *cmd) {
     i++;
   }
 
-  char* envp[] = {"/bin", "/usr/bin"};
-  execve(argv[0], argv, envp);
+  // char* envp[] = {"/bin", "/usr/bin"};
+  execvp(argv[0], argv);
 }
 
 void builtin_sh_run() {
