@@ -69,13 +69,13 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
     envplen += strlen(envp[envc]) + 1;
     envc++;
   }
-  Log("argc: %d, envc: %d\n", argc, envc);
+//   Log("argc: %d, envc: %d\n", argc, envc);
   void* ret = new_page(4);
   ret -= argvlen + envplen + (argc + envc + 2) * sizeof(char*) + sizeof(int) + 12;
   *((int*)ret) = argc;
   char** argvp = ret + sizeof(int);
   char* string_area = ret + sizeof(int) + (argc + envc + 2) * sizeof(char*);
-  Log("ret: %p, argvp: %p, string_area: %p\n", ret, argvp, string_area);
+//   Log("ret: %p, argvp: %p, string_area: %p\n", ret, argvp, string_area);
   for(int i = 0; i < argc; i++)
   {
     strcpy(string_area, argv[i]);
@@ -92,6 +92,7 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
     string_area += strlen(envp[i]) + 1;
   }
   uintptr_t entry = loader(pcb, filename);
+  Log("Jump to entry = %p", entry);
   pcb->cp = ucontext(NULL, (Area) { pcb->stack, pcb->stack + STACK_SIZE }, (void*)entry);
   pcb->cp->GPRx = (uintptr_t)ret;
 }
