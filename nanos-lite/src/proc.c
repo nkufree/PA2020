@@ -49,7 +49,7 @@ void init_proc() {
   *a = 0;
   *b = 1;
   context_kload(&pcb[0], hello_fun, (void*)a);
-  char* argv[] = {"/bin/nterm", "/bin/nslider", NULL};
+  char* argv[] = {"/bin/nterm", NULL};
   context_uload(&pcb[1], "/bin/nterm", argv, NULL);
   switch_boot_pcb();
 
