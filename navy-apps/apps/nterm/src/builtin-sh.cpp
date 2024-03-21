@@ -23,8 +23,8 @@ static void sh_prompt() {
 }
 
 static void sh_handle_cmd(const char *cmd) {
-  char* argv[16] = {NULL};
-  int argc = 0;
+  char* argv[16] = {"/bin/busybox", NULL};
+  int argc = 1;
   const char* start = cmd;
   int len = 0;
   while (*cmd)
