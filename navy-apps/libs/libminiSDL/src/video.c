@@ -31,8 +31,8 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
   else {
     dst_x = dstrect->x;
     dst_y = dstrect->y;
-    dst_w = dstrect->w;
-    dst_h = dstrect->h;
+    dst_w = dstrect->w == 0 ? w : dstrect->w;
+    dst_h = dstrect->h == 0 ? w : dstrect->h;
   }
   if(src->format->BitsPerPixel == 32)
   {
