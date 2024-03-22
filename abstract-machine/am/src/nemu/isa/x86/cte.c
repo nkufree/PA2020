@@ -12,11 +12,13 @@ void __am_irq0();
 void __am_vecsys();
 void __am_vectrap();
 void __am_vecnull();
-
+void __am_get_cur_as(Context *c);
+void __am_switch(Context *c);
 
 Context* __am_irq_handle(Context *c) {
   // printf("cr3 :%d, edi: %d, edx: %d, eflags: %d, cs: %d\n",c->cr3, c->edi, c->edx, c->eflags, c->cs);
   // printf("irq: %d\n", c->irq);
+  __am_get_cur_as(c);
   if (user_handler) {
     Event ev = {0};
     switch (c->irq) {
@@ -28,7 +30,8 @@ Context* __am_irq_handle(Context *c) {
     c = user_handler(ev, c);
     assert(c != NULL);
   }
-
+  if(c->cr3 != NULL)
+    __am_switch(c);
   return c;
 }
 
