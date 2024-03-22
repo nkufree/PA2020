@@ -72,25 +72,18 @@ word_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len) {
   uint32_t offset = vaddr & 0xfff;
   uint32_t len1 = PAGE_SIZE - offset;
   uint32_t len2 = len - len1;
-  printf("len1: %d, len2: %d\n", len1, len2);
-  assert(len1 == 1 || len1 == 2 || len1 == 4);
-  assert(len2 == 1 || len2 == 2 || len2 == 4);
-  word_t data1 = paddr_read(paddr, len1);
+  word_t data1 = paddr_read(paddr, 4) >> (len2 * 8);
   vaddr_t vaddr2 = (vaddr & 0xfffff000) + PAGE_SIZE;
   paddr_t paddr2 = page_table_walk(vaddr2);
-  word_t data2 = paddr_read(paddr2, len2);
+  word_t data2 = paddr_read(paddr2, 4) >> (len1 * 8);
   return (data2 << (len1 * 8)) | data1;
 }
 
 void vaddr_write_cross_page(vaddr_t vaddr ,word_t data,int len) {
   paddr_t paddr = page_table_walk(vaddr);
-  uint32_t offset = vaddr & 0xfff;
-  uint32_t len1 = PAGE_SIZE - offset;
-  uint32_t len2 = len - len1;
-  paddr_write(paddr, data &((1 << (len1 * 8)) - 1), len1);
-  vaddr_t vaddr2 = (vaddr & 0xfffff000) + PAGE_SIZE;
-  paddr_t paddr2 = page_table_walk(vaddr2);
-  paddr_write(paddr2, data >> (len1 * 8), len2);
+  for(int i = 0; i < len; i++) {
+    paddr_write(paddr + i, (data >> (i * 8)) & 0xff, 1);
+  }
   return;
 }
 
