@@ -18,6 +18,7 @@ int fs_close(int fd);
 Context* ucontext(AddrSpace *as, Area kstack, void *entry);
 void* new_page(size_t nr_page);
 void map(AddrSpace *as, void *va, void *pa, int prot);
+void protect(AddrSpace *as);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   int fd = fs_open(filename, 0, 0);
@@ -114,6 +115,7 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
     envc++;
   }
 //   Log("argc: %d, envc: %d\n", argc, envc);
+  protect(&pcb->as);
   void* ret = new_page(8);
   void* end = ret + 8 * PGSIZE;
   printf("pcb->as.area.start: %p, pcb->as.area.end: %p\n", pcb->as.area.start, pcb->as.area.end);
