@@ -115,7 +115,7 @@ void vaddr_mmu_write(vaddr_t addr, word_t data, int len) {
     vaddr_write_cross_page(addr, data, len);
   }
   else {
-    printf("write error[%d], vaddr: %p, data: %x, len: %d\n", pg_base, (void*)(uintptr_t)addr, data, len);
+    printf("write error[%d], vaddr: %p, data: %x, len: %d, pc = %x\n", pg_base, (void*)(uintptr_t)addr, data, len, cpu.pc);
     assert(0);
   }
   return;
