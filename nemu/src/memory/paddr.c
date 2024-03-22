@@ -114,8 +114,10 @@ void vaddr_mmu_write(vaddr_t addr, word_t data, int len) {
   else if(pg_base == MEM_RET_CROSS_PAGE) {
     vaddr_write_cross_page(addr, data, len);
   }
-  else 
+  else {
+    printf("write error, vaddr: %x, data: %x, len: %d\n", addr, data, len);
     assert(0);
+  }
   return;
 }
 
