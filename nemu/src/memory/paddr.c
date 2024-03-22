@@ -92,6 +92,7 @@ void vaddr_write_cross_page(vaddr_t vaddr ,word_t data,int len) {
 }
 
 word_t vaddr_mmu_read(vaddr_t addr, int len, int type) {
+  assert(len == 1 || len == 2 || len == 4);
   paddr_t pg_base = isa_mmu_translate(addr, type, len);
   if(pg_base == MEM_RET_OK) {
     paddr_t paddr = page_table_walk(addr);
@@ -108,6 +109,7 @@ word_t vaddr_mmu_read(vaddr_t addr, int len, int type) {
 }
 
 void vaddr_mmu_write(vaddr_t addr, word_t data, int len) {
+  assert(len == 1 || len == 2 || len == 4);
   paddr_t pg_base = isa_mmu_translate(addr, data, len);
   if(pg_base == MEM_RET_OK) {
     paddr_t paddr = page_table_walk(addr);
