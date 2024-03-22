@@ -18,10 +18,10 @@ typedef struct {
   int total_len;
 } fmt_parser;
 
-static void itora(int num, char* s, int* len, int base)
+static void itora(int num, char* s, int* len, int base, bool is_unsigned)
 {
   bool minus = num < 0;
-  if(minus)
+  if(minus && !is_unsigned)
     num = -num;
   if(num == 0)
   {
@@ -83,7 +83,7 @@ repeat:
           case 'd':
             fmtp->fmt++;
             fmtp->state = FMT_D;
-            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 10);
+            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 10, false);
             break;
           case 's':
             fmtp->fmt++;
@@ -96,12 +96,12 @@ repeat:
           case 'x':
             fmtp->fmt++;
             fmtp->state = FMT_D;
-            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 16);
+            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 16, false);
             break;
           case 'p':
             fmtp->fmt++;
             fmtp->state = FMT_D;
-            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 16);
+            itora(va_arg(fmtp->ap, int), fmtp->helpd, &fmtp->helplen, 16, true);
             while(fmtp->helplen < sizeof(uintptr_t) * 2)
             {
               fmtp->helpd[fmtp->helplen] = '0';
