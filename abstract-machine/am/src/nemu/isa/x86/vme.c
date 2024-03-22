@@ -61,16 +61,16 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   uint32_t page = ((uint32_t)va >> 12) & 0x3ff;
   PTE* cr3 = (PTE*)as->ptr;
   if (!(cr3[dir] & 0x1)) {
-    cr3[dir] = (PTE)pgalloc_usr(PGSIZE) | 0x1 | prot;
+    cr3[dir] = (PTE)pgalloc_usr(PGSIZE) | 0x1;
     printf("alloc new page table: %p\n", cr3[dir]);
   }
   PTE* pdir = (PTE*)(cr3[dir] & ~0xfff);
-  printf("cr3: %p, pdir: %p\n", cr3, pdir);
+  printf("cr3: %p, dir: %p, pdir: %p\n", cr3, dir, pdir);
   if(pdir[page] & 0x1) {
     printf("page already map, pdir: %p, pdir[page]: %p\n", pdir, pdir[page]);
     assert(0);
   }
-  pdir[page] = ((PTE)pa & ~0xfff) | 0x1 | prot;
+  pdir[page] = ((PTE)pa & ~0xfff) | 0x1;
 }
 
 Context* ucontext(AddrSpace *as, Area kstack, void *entry) {
