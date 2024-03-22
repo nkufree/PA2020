@@ -144,7 +144,7 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
     string_area += strlen(envp[i]) + 1;
   }
   uintptr_t entry = loader(pcb, filename);
-  Log("Jump to entry = %p", entry);
+  Log("entry = %p", entry);
   pcb->cp = ucontext(NULL, (Area) { pcb->stack, pcb->stack + STACK_SIZE }, (void*)entry);
   pcb->cp->GPRx = (uintptr_t)ret;
 }
