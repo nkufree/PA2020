@@ -2,6 +2,7 @@
 #include <memory/vaddr.h>
 #include <memory/paddr.h>
 paddr_t isa_mmu_translate(vaddr_t vaddr, int type, int len) {
+  printf("cpu.cr3: %p\n", (void*)(uintptr_t)cpu.cr3);
   uint32_t dir = (uint32_t)vaddr >> 22;
   uint32_t page = (uint32_t)vaddr >> 12 & 0x3ff;
   uint32_t offset = (uint32_t)vaddr & 0xfff;
