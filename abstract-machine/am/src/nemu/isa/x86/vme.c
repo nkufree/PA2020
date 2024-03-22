@@ -65,7 +65,8 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   }
   PTE* pdir = (PTE*)(cr3[dir] & ~0xfff);
   if(pdir[page] & 0x1) {
-    panic("mapping already exists");
+    printf("page already map, pdir[page]: %p\n", pdir[page]);
+    assert(0);
   }
   pdir[page] = (PTE)pa | 0x1 | prot;
 }
