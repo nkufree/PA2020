@@ -34,7 +34,7 @@ int execve(const char *filename, char *const argv[], char *const envp[]) {
   int fd = fs_open(filename, 0, 0);
   if(fd == -1)
   {
-    Log("execve: file %s not found\n", filename);
+    Log("execve: file %s not found", filename);
     return -2;
   }
   context_uload(current, filename, argv, envp);
@@ -45,10 +45,7 @@ int execve(const char *filename, char *const argv[], char *const envp[]) {
 
 void init_proc() {
   Log("Initializing processes...");
-  int32_t* a = malloc(sizeof(int32_t)), *b = malloc(sizeof(int32_t));
-  *a = 0;
-  *b = 1;
-  context_kload(&pcb[0], hello_fun, (void*)a);
+  context_kload(&pcb[0], hello_fun, NULL);
   Log("Init hello_fun OK");
   char* argv[] = {"/bin/nterm", NULL};
   context_uload(&pcb[1], "/bin/nterm", argv, NULL);
