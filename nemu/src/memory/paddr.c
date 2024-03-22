@@ -98,7 +98,7 @@ word_t vaddr_mmu_read(vaddr_t addr, int len, int type) {
     return vaddr_read_cross_page(addr, type, len);
   }
   else {
-    printf("read error[%d], vaddr: %p, len: %d, type: %d, pc = %x\n", pg_base, (void*)(uintptr_t)addr, len, type, cpu.pc);
+    printf("read error[%d], vaddr: %p, len: %d, type: %d, pc = 0x%x\n", pg_base, (void*)(uintptr_t)addr, len, type, cpu.pc);
     assert(0);
   }
   return 0;
@@ -115,7 +115,7 @@ void vaddr_mmu_write(vaddr_t addr, word_t data, int len) {
     vaddr_write_cross_page(addr, data, len);
   }
   else {
-    printf("write error[%d], vaddr: %p, data: %x, len: %d, pc = %x\n", pg_base, (void*)(uintptr_t)addr, data, len, cpu.pc);
+    printf("write error[%d], vaddr: %p, data: %x, len: %d, pc = 0x%x\n", pg_base, (void*)(uintptr_t)addr, data, len, cpu.pc);
     assert(0);
   }
   return;
