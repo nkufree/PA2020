@@ -75,7 +75,7 @@ word_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len) {
   word_t data1 = paddr_read(paddr, 4) & ((1 << (len2 * 8)) - 1);
   vaddr_t vaddr2 = (vaddr & 0xfffff000) + PAGE_SIZE;
   paddr_t paddr2 = page_table_walk(vaddr2);
-  word_t data2 = paddr_read(paddr2, 4) >> (len1 * 8);
+  word_t data2 = paddr_read(paddr2, 4) & ((1 << (len1 * 8)) - 1);
   return (data2 << (len1 * 8)) | data1;
 }
 
