@@ -79,6 +79,18 @@ word_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len) {
   return (data2 << (len1 * 8)) | data1;
 }
 
+void vaddr_write_cross_page(vaddr_t vaddr ,word_t data,int len) {
+  paddr_t paddr = page_table_walk(vaddr);
+  uint32_t offset = vaddr & 0xfff;
+  uint32_t len1 = PAGE_SIZE - offset;
+  uint32_t len2 = len - len1;
+  paddr_write(paddr, data & (len1 * 8), len1);
+  vaddr_t vaddr2 = (vaddr & 0xfffff000) + PAGE_SIZE;
+  paddr_t paddr2 = page_table_walk(vaddr2);
+  paddr_write(paddr2, data >> (len1 * 8), len2);
+  return;
+}
+
 word_t vaddr_mmu_read(vaddr_t addr, int len, int type) {
   paddr_t pg_base = isa_mmu_translate(addr, type, len);
   if(pg_base == MEM_RET_OK) {
@@ -92,7 +104,15 @@ word_t vaddr_mmu_read(vaddr_t addr, int len, int type) {
 }
 
 void vaddr_mmu_write(vaddr_t addr, word_t data, int len) {
-  assert(0);
+  paddr_t pg_base = isa_mmu_translate(addr, data, len);
+  if(pg_base == MEM_RET_OK) {
+    paddr_t paddr = page_table_walk(addr);
+    paddr_write(paddr, data, len);
+  }
+  else if(pg_base == MEM_RET_CROSS_PAGE) {
+    vaddr_write_cross_page(addr, data, len);
+  }
+  return;
 }
 
 
