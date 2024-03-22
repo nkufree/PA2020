@@ -24,6 +24,7 @@ static void sh_prompt() {
 
 static void sh_handle_cmd(const char *cmd) {
   printf("cmd = %s\n", cmd);
+  setenv("PATH","/usr/bin:/bin",0);
   char* argv[16] = {NULL};
   int argc = 0;
   const char* start = cmd;
