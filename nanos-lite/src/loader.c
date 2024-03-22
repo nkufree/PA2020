@@ -118,6 +118,7 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
   void* end = ret + 8 * PGSIZE;
   for(int i = 0; i < 8; i++) {
     map(&pcb->as, pcb->as.area.end - 1, end - i * PGSIZE, 0x7);
+    printf("vaddr: %p, paddr: %p\n", pcb->as.area.end - 1, end - i * PGSIZE);
   }
   ret -= argvlen + envplen + (argc + envc + 2) * sizeof(char*) + sizeof(int) + 12;
   *((int*)ret) = argc;
