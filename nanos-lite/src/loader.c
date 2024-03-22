@@ -53,6 +53,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       last_page = new_page(1);
       fs_read(fd, last_page, len);
       map(&pcb->as, (void*)start, last_page, 0);
+      printf("vaddr: %p, len: %d, paddr: %p\n", start, len, last_page);
       start += len;
       build_size += len;
     }
@@ -67,6 +68,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     if(len < PGSIZE) {
       len = ph->p_memsz - build_size < PGSIZE ? ph->p_memsz - build_size : PGSIZE;
       memset((void*)start, 0, len);
+      printf("vaddr: %p, len: %d, paddr: %p\n", start, len, last_page);
       start += len;
       build_size += len;
     }
@@ -80,6 +82,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       last_page = new_page(1);
       memset(last_page, 0, len);
       map(&pcb->as, (void*)start, last_page, 0);
+      printf("vaddr: %p, len: %d, paddr: %p\n", start, len, last_page);
       start += len;
       build_size += len;
     }
