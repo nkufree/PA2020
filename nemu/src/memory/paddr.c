@@ -72,6 +72,8 @@ word_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len) {
   uint32_t offset = vaddr & 0xfff;
   uint32_t len1 = PAGE_SIZE - offset;
   uint32_t len2 = len - len1;
+  assert(len1 == 1 || len1 == 2 || len1 == 4);
+  assert(len2 == 1 || len2 == 2 || len2 == 4);
   word_t data1 = paddr_read(paddr, len1);
   vaddr_t vaddr2 = (vaddr & 0xfffff000) + PAGE_SIZE;
   paddr_t paddr2 = page_table_walk(vaddr2);
