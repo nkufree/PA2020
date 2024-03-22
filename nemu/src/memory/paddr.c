@@ -100,8 +100,10 @@ word_t vaddr_mmu_read(vaddr_t addr, int len, int type) {
   else if(pg_base == MEM_RET_CROSS_PAGE) {
     return vaddr_read_cross_page(addr, type, len);
   }
-  else
+  else {
+    printf("read error, vaddr: %x, len: %d, type: %d\n", addr, len, type);
     assert(0);
+  }
   return 0;
 }
 
