@@ -34,7 +34,7 @@ int execve(const char *filename, char *const argv[], char *const envp[]) {
   int fd = fs_open(filename, 0, 0);
   if(fd == -1)
   {
-    Log("execve: file not found\n");
+    Log("execve: file %s not found\n", filename);
     return -2;
   }
   context_uload(current, filename, argv, envp);
