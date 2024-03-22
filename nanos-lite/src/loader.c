@@ -53,8 +53,8 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       }
       last_page = new_page(1);
       fs_read(fd, last_page, len);
+      printf("map vaddr: %p, len: %d, paddr: %p\n", start, len, last_page);
       map(&pcb->as, (void*)start, last_page, 0);
-      printf("vaddr: %p, len: %d, paddr: %p\n", start, len, last_page);
       start += len;
       build_size += len;
     }
@@ -82,8 +82,8 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       }
       last_page = new_page(1);
       memset(last_page, 0, len);
+      printf("map vaddr: %p, len: %d, paddr: %p\n", start, len, last_page);
       map(&pcb->as, (void*)start, last_page, 0);
-      printf("vaddr: %p, len: %d, paddr: %p\n", start, len, last_page);
       start += len;
       build_size += len;
     }
