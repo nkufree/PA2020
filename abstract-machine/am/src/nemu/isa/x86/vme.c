@@ -56,21 +56,46 @@ void __am_switch(Context *c) {
   }
 }
 
+// void map(AddrSpace *as, void *va, void *pa, int prot) {
+//   uint32_t dir = (uint32_t)va >> 22;
+//   uint32_t page = ((uint32_t)va >> 12) & 0x3ff;
+//   PTE* cr3 = (PTE*)as->ptr;
+//   if (!(cr3[dir] & 0x1)) {
+//     cr3[dir] = (PTE)pgalloc_usr(PGSIZE) | 0x1;
+//     printf("alloc new page table: %p\n", cr3[dir]);
+//   }
+//   PTE* pdir = (PTE*)(cr3[dir] & ~0xfff);
+//   printf("cr3: %p, dir: %p, pdir: %p\n", cr3, dir, pdir);
+//   if(pdir[page] & 0x1) {
+//     printf("page already map, pdir: %p, pdir[page]: %p\n", pdir, pdir[page]);
+//     assert(0);
+//   }
+//   pdir[page] = ((PTE)pa & ~0xfff) | 0x1;
+// }
+
 void map(AddrSpace *as, void *va, void *pa, int prot) {
-  uint32_t dir = (uint32_t)va >> 22;
-  uint32_t page = ((uint32_t)va >> 12) & 0x3ff;
-  PTE* cr3 = (PTE*)as->ptr;
-  if (!(cr3[dir] & 0x1)) {
-    cr3[dir] = (PTE)pgalloc_usr(PGSIZE) | 0x1;
-    printf("alloc new page table: %p\n", cr3[dir]);
+  assert(as != NULL);
+  //printf("va %x pa %x\n",va,pa);
+  uint32_t va_dir_idx = ((uint32_t)va >> 22)&0x3ff;
+  uint32_t va_page_table_idx = ((uint32_t)va >> 12)&0x3ff;
+  //printf("pdx = %x  ptx = %x\n",va_dir_idx,va_page_table_idx);
+  uint32_t page_table_entry = (((uint32_t*)as->ptr)[va_dir_idx]);//得到页目录
+  //printf("%p %x %p %x %x\n",as->ptr,va_dir_idx,page_table_entry,va_page_table_idx,va_page_table_idx);
+  if((page_table_entry&1) == 0) {
+    page_table_entry = (uint32_t)pgalloc_usr(PGSIZE);//低12位都是0
+    ((uint32_t*)as->ptr)[va_dir_idx] = (uint32_t)page_table_entry|1;
   }
-  PTE* pdir = (PTE*)(cr3[dir] & ~0xfff);
-  printf("cr3: %p, dir: %p, pdir: %p\n", cr3, dir, pdir);
-  if(pdir[page] & 0x1) {
-    printf("page already map, pdir: %p, pdir[page]: %p\n", pdir, pdir[page]);
+  assert(((((uint32_t*)as->ptr)[va_dir_idx])&1) == 1);
+  uint32_t* page_table = (uint32_t*)((((uint32_t*)as->ptr)[va_dir_idx])&(~0xfff));
+  if((page_table[va_page_table_idx]&1) == 0)
+  {
+    //if(as->ptr != kas.ptr) printf("ptx:%x value = %x vaddr = %p\n",va_page_table_idx,((uint32_t)pa&(~0xfff)),va);
+    page_table[va_page_table_idx] = ((uint32_t)pa&(~0xfff)) | 1;
+  }
+  else {
     assert(0);
+    page_table[va_page_table_idx] = ((uint32_t)pa&(~0xfff)) | 1;
   }
-  pdir[page] = ((PTE)pa & ~0xfff) | 0x1;
 }
 
 Context* ucontext(AddrSpace *as, Area kstack, void *entry) {
