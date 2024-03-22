@@ -54,12 +54,12 @@ static void sh_handle_cmd(const char *cmd) {
   }
   argv[argc] = NULL;
 
-  int i = 0;
-  while (argv[i] != NULL)
-  {
-    printf("argv[%d] = %s\n", i, argv[i]);
-    i++;
-  }
+//   int i = 0;
+//   while (argv[i] != NULL)
+//   {
+//     printf("argv[%d] = %s\n", i, argv[i]);
+//     i++;
+//   }
 
   // char* envp[] = {"/bin", "/usr/bin"};
   execvp(argv[0], argv);
