@@ -47,8 +47,8 @@ void init_proc() {
   Log("Initializing processes...");
   context_kload(&pcb[0], hello_fun, NULL);
   Log("Init hello_fun OK");
-  char* argv[] = {"/bin/nterm", NULL};
-  context_uload(&pcb[1], "/bin/nterm", argv, NULL);
+  char* argv[] = {"/bin/pal","--skip", NULL};
+  context_uload(&pcb[1], "/bin/pal", argv, NULL);
   Log("Init user thread OK");
   switch_boot_pcb();
 
