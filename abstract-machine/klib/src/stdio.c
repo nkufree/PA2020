@@ -18,11 +18,14 @@ typedef struct {
   int total_len;
 } fmt_parser;
 
-static void itora(int num, char* s, int* len, int base, bool is_unsigned)
+static void itora(int num32, char* s, int* len, int base, bool is_unsigned)
 {
-  bool minus = num < 0;
-  if(minus && !is_unsigned)
-    num = -num;
+  int64_t num = 0;
+  bool minus = num32 < 0 && !is_unsigned;
+  if(minus)
+    num = -num32;
+  else
+    num = (uint32_t)num;
   if(num == 0)
   {
     s[0] = '0';
