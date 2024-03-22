@@ -66,10 +66,10 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   printf("cr3: %p\n", cr3);
   PTE* pdir = (PTE*)(cr3[dir] & ~0xfff);
   if(pdir[page] & 0x1) {
-    printf("page already map, pdir[page]: %p\n", pdir[page]);
+    printf("page already map, pdir: %p, pdir[page]: %p\n", pdir, pdir[page]);
     assert(0);
   }
-  pdir[page] = (PTE)pa | 0x1 | prot;
+  pdir[page] = ((PTE)pa & ~0xfff) | 0x1 | prot;
 }
 
 Context* ucontext(AddrSpace *as, Area kstack, void *entry) {
