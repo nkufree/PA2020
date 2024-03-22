@@ -67,16 +67,40 @@ inline void paddr_write(paddr_t addr, word_t data, int len) {
 
 paddr_t page_table_walk(vaddr_t vaddr);
 
-word_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len) {
+// word_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len) {
+//   paddr_t paddr = page_table_walk(vaddr);
+//   uint32_t offset = vaddr & 0xfff;
+//   uint32_t len1 = PAGE_SIZE - offset;
+//   uint32_t len2 = len - len1;
+//   word_t data1 = paddr_read(paddr, 4) >> (len2 * 8);
+//   vaddr_t vaddr2 = (vaddr & 0xfffff000) + PAGE_SIZE;
+//   paddr_t paddr2 = page_table_walk(vaddr2);
+//   word_t data2 = paddr_read(paddr2, 4) >> (len1 * 8);
+//   return (data2 << (len1 * 8)) | data1;
+// }
+
+paddr_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len)
+{
   paddr_t paddr = page_table_walk(vaddr);
-  uint32_t offset = vaddr & 0xfff;
-  uint32_t len1 = PAGE_SIZE - offset;
-  uint32_t len2 = len - len1;
-  word_t data1 = paddr_read(paddr, 4) >> (len2 * 8);
-  vaddr_t vaddr2 = (vaddr & 0xfffff000) + PAGE_SIZE;
-  paddr_t paddr2 = page_table_walk(vaddr2);
-  word_t data2 = paddr_read(paddr2, 4) >> (len1 * 8);
-  return (data2 << (len1 * 8)) | data1;
+  uint32_t offset = vaddr&0xfff;
+  uint32_t partial = offset + len - PAGE_SIZE;
+  uint32_t low=0,high =0;
+  if(len - partial == 3)
+  {
+    low = paddr_read(paddr,4)&0xffffff;
+  }
+  else low = paddr_read(paddr,len - partial);
+  if(partial == 3)
+  {
+    high = paddr_read(page_table_walk((vaddr&(~0xfff)) + PAGE_SIZE),4)&0xffffff;
+  }
+  else high = paddr_read(page_table_walk((vaddr&(~0xfff)) + PAGE_SIZE),partial);
+  //printf("pc = %x:offset = %d base = %x :cross read = %x partial = %d, high = %x, low = %x\n",cpu.pc,offset,cpu.CR3,((high << 8*(len-partial))|low),partial,high,low);
+  /* assert(len - partial != 3&&partial != 3);
+  low = paddr_read(paddr,len - partial);
+  high = paddr_read(page_table_walk((vaddr&0xfff) + PAGE_SIZE),partial); */
+  //printf("cross read %x\n",((high << 8*(len-partial))|low));
+  return ((high << 8*(len-partial))|low);
 }
 
 void vaddr_write_cross_page(vaddr_t vaddr ,word_t data,int len) {
