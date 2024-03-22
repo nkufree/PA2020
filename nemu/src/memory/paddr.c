@@ -98,7 +98,7 @@ word_t vaddr_mmu_read(vaddr_t addr, int len, int type) {
     return vaddr_read_cross_page(addr, type, len);
   }
   else {
-    printf("read error[%d], vaddr: %p, len: %d, type: %d\n", pg_base, (void*)(uintptr_t)addr, len, type);
+    printf("read error[%d], vaddr: %p, len: %d, type: %d, pc = %x\n", pg_base, (void*)(uintptr_t)addr, len, type, cpu.pc);
     assert(0);
   }
   return 0;
