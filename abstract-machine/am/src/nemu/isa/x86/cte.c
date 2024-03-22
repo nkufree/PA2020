@@ -18,9 +18,9 @@ void __am_switch(Context *c);
 Context* __am_irq_handle(Context *c) {
   // printf("cr3 :%d, edi: %d, edx: %d, eflags: %d, cs: %d\n",c->cr3, c->edi, c->edx, c->eflags, c->cs);
   // printf("irq: %d\n", c->irq);
-  printf("c->cr3: %p/n", c->cr3);
+//   printf("c->cr3: %p/n", c->cr3);
   __am_get_cur_as(c);
-  printf("c->cr3: %p/n", c->cr3);
+//   printf("c->cr3: %p/n", c->cr3);
 
   if (user_handler) {
     Event ev = {0};
@@ -33,7 +33,7 @@ Context* __am_irq_handle(Context *c) {
     c = user_handler(ev, c);
     assert(c != NULL);
   }
-  printf("cr3 = %p pc = %x\n",c->cr3,c->eip);
+//   printf("cr3 = %p pc = %x\n",c->cr3,c->eip);
   if(c->cr3 != NULL)
     __am_switch(c);
   return c;
