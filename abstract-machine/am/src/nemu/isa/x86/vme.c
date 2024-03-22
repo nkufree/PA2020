@@ -63,8 +63,8 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   if (!(cr3[dir] & 0x1)) {
     cr3[dir] = (PTE)pgalloc_usr(PGSIZE) | 0x1 | prot;
   }
-  printf("cr3: %p\n", cr3);
   PTE* pdir = (PTE*)(cr3[dir] & ~0xfff);
+  printf("cr3: %p, pdir: %p\n", cr3, pdir);
   if(pdir[page] & 0x1) {
     printf("page already map, pdir: %p, pdir[page]: %p\n", pdir, pdir[page]);
     assert(0);
