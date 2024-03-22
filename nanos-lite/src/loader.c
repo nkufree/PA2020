@@ -65,7 +65,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     start = ph->p_vaddr + ph->p_filesz;
     // 最后一页没填满，不需要分配新页，直接写入
     if(len < PGSIZE) {
-      len = ph->p_memsz - build_size;
+      len = ph->p_memsz - build_size < PGSIZE ? ph->p_memsz - build_size : PGSIZE;
       memset((void*)start, 0, len);
       start += len;
       build_size += len;
