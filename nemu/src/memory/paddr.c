@@ -68,6 +68,7 @@ inline void paddr_write(paddr_t addr, word_t data, int len) {
 paddr_t page_table_walk(vaddr_t vaddr);
 
 word_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len) {
+  Log("vaddr_read_cross_page: vaddr = 0x%x, type = %d, len = %d", vaddr, type, len);
   paddr_t paddr = page_table_walk(vaddr);
   uint32_t offset = vaddr & 0xfff;
   uint32_t len1 = PAGE_SIZE - offset;
@@ -80,6 +81,7 @@ word_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len) {
 }
 
 void vaddr_write_cross_page(vaddr_t vaddr ,word_t data,int len) {
+  Log("vaddr_write_cross_page: vaddr = 0x%x, data = 0x%x, len = %d", vaddr, data, len);
   paddr_t paddr = page_table_walk(vaddr);
   for(int i = 0; i < len; i++) {
     paddr_write(paddr + i, (data >> (i * 8)) & 0xff, 1);
