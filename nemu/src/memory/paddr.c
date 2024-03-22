@@ -65,24 +65,54 @@ inline void paddr_write(paddr_t addr, word_t data, int len) {
   else map_write(addr, data, len, fetch_mmio_map(addr));
 }
 
-word_t vaddr_mmu_read(vaddr_t addr, int len, int type);
-void vaddr_mmu_write(vaddr_t addr, word_t data, int len);
+paddr_t page_table_walk(vaddr_t vaddr);
+
+word_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len) {
+  paddr_t paddr = page_table_walk(vaddr);
+  uint32_t offset = vaddr & 0xfff;
+  uint32_t len1 = PAGE_SIZE - offset;
+  uint32_t len2 = len - len1;
+  word_t data1 = paddr_read(paddr, len1);
+  vaddr_t vaddr2 = (vaddr & 0xfffff000) + PAGE_SIZE;
+  paddr_t paddr2 = page_table_walk(vaddr2);
+  word_t data2 = paddr_read(paddr2, len2);
+  return (data2 << (len1 * 8)) | data1;
+}
+
+word_t vaddr_mmu_read(vaddr_t addr, int len, int type) {
+  paddr_t pg_base = isa_mmu_translate(addr, type, len);
+  if(pg_base == MEM_RET_OK) {
+    paddr_t paddr = page_table_walk(addr);
+    return paddr_read(paddr, len);
+  }
+  else if(pg_base == MEM_RET_CROSS_PAGE) {
+    return vaddr_read_cross_page(addr, type, len);
+  }
+  return 0;
+}
+
+void vaddr_mmu_write(vaddr_t addr, word_t data, int len) {
+  assert(0);
+}
 
 
 #define def_vaddr_template(bytes) \
 word_t concat(vaddr_ifetch, bytes) (vaddr_t addr) { \
   int ret = isa_vaddr_check(addr, MEM_TYPE_IFETCH, bytes); \
   if (ret == MEM_RET_OK) return paddr_read(addr, bytes); \
+  else if(ret == MEM_RET_NEED_TRANSLATE) return vaddr_mmu_read(addr, bytes, MEM_TYPE_IFETCH); \
   return 0; \
 } \
 word_t concat(vaddr_read, bytes) (vaddr_t addr) { \
   int ret = isa_vaddr_check(addr, MEM_TYPE_READ, bytes); \
   if (ret == MEM_RET_OK) return paddr_read(addr, bytes); \
+  else if(ret == MEM_RET_NEED_TRANSLATE) return vaddr_mmu_read(addr, bytes, MEM_TYPE_READ); \
   return 0; \
 } \
 void concat(vaddr_write, bytes) (vaddr_t addr, word_t data) { \
   int ret = isa_vaddr_check(addr, MEM_TYPE_WRITE, bytes); \
   if (ret == MEM_RET_OK) paddr_write(addr, data, bytes); \
+  else if(ret == MEM_RET_NEED_TRANSLATE) vaddr_mmu_write(addr, data, bytes); \
 }
 
 

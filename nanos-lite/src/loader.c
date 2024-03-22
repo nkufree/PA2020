@@ -17,6 +17,7 @@ size_t fs_lseek(int fd, size_t offset, int whence);
 int fs_close(int fd);
 Context* ucontext(AddrSpace *as, Area kstack, void *entry);
 void* new_page(size_t nr_page);
+void map(AddrSpace *as, void *va, void *pa, int prot);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   int fd = fs_open(filename, 0, 0);
@@ -39,10 +40,50 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     uintptr_t start = ph->p_vaddr;
     // 复制TEXT/DATA到指定位置
     fs_lseek(fd, ph->p_offset, SEEK_SET);
-    fs_read(fd, (void*)start, ph->p_filesz);
+    size_t build_size = 0;
+    void* last_page = NULL;
+    size_t len = 0;
+    while (build_size < ph->p_filesz)
+    {
+      len = ph->p_filesz - build_size;
+      if (len > PGSIZE)
+      {
+        len = PGSIZE;
+      }
+      last_page = new_page(1);
+      fs_read(fd, last_page, len);
+      map(&pcb->as, (void*)start, last_page, 0);
+      start += len;
+      build_size += len;
+    }
+    if(ph->p_filesz == ph->p_memsz)
+    {
+      continue;
+    }
+    // fs_read(fd, (void*)start, ph->p_filesz);
     // 构建BSS
     start = ph->p_vaddr + ph->p_filesz;
-    memset((void*)start, 0, ph->p_memsz - ph->p_filesz);
+    // 最后一页没填满，不需要分配新页，直接写入
+    if(len < PGSIZE) {
+      len = ph->p_memsz - build_size;
+      memset((void*)start, 0, len);
+      start += len;
+      build_size += len;
+    }
+    while(build_size < ph->p_memsz)
+    {
+      len = ph->p_memsz - build_size;
+      if (len > PGSIZE)
+      {
+        len = PGSIZE;
+      }
+      last_page = new_page(1);
+      memset(last_page, 0, len);
+      map(&pcb->as, (void*)start, last_page, 0);
+      start += len;
+      build_size += len;
+    }
+    // memset((void*)start, 0, ph->p_memsz - ph->p_filesz);
   }
   fs_close(fd);
 

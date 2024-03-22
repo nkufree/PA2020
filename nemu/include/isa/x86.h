@@ -54,6 +54,8 @@ typedef struct {
   } idtr;
   uint32_t cs;
   vaddr_t pc;
+  uint32_t cr0;
+  uint32_t cr3;
 } x86_CPU_state;
 
 // decode

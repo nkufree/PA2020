@@ -57,6 +57,17 @@ void __am_switch(Context *c) {
 }
 
 void map(AddrSpace *as, void *va, void *pa, int prot) {
+  uint32_t dir = (uint32_t)va >> 22;
+  uint32_t page = ((uint32_t)va >> 12) & 0x3ff;
+  PTE* cr3 = (PTE*)as->ptr;
+  if (!(cr3[dir] & 0x1)) {
+    cr3[dir] = (PTE)pgalloc_usr(PGSIZE) | 0x1 | prot;
+  }
+  PTE* pdir = (PTE*)(cr3[dir] & ~0xfff);
+  if(pdir[page] & 0x1) {
+    panic("mapping already exists");
+  }
+  pdir[page] = (PTE)pa | 0x1 | prot;
 }
 
 Context* ucontext(AddrSpace *as, Area kstack, void *entry) {

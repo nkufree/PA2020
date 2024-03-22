@@ -17,12 +17,26 @@ static inline def_EHelper(lidt) {
 }
 
 static inline def_EHelper(mov_r2cr) {
-  TODO();
+  switch(id_dest->reg) {
+    case 0:
+      cpu.cr0 = *dsrc1;
+      break;
+    case 3:
+      cpu.cr3 = *dsrc1;
+      break;
+  }
   print_asm("movl %%%s,%%cr%d", reg_name(id_src1->reg, 4), id_dest->reg);
 }
 
 static inline def_EHelper(mov_cr2r) {
-  TODO();
+  switch(id_src1->reg) {
+    case 0:
+      *ddest = cpu.cr0;
+      break;
+    case 3:
+      *ddest = cpu.cr3;
+      break;
+  }
   print_asm("movl %%cr%d,%%%s", id_src1->reg, reg_name(id_dest->reg, 4));
 
 #ifndef __DIFF_REF_NEMU__

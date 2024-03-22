@@ -103,6 +103,8 @@ static inline def_EHelper(2byte_esc) {
   switch (opcode) {
   /* TODO: Add more instructions!!! */
     IDEX (0x01, gp7_E, gp7)
+    IDEX (0x20, G2E, mov_cr2r)
+    IDEX (0x22, E2G, mov_r2cr)
     IDEX (0x80, J, jcc)
     IDEX (0x81, J, jcc)
     IDEX (0x82, J, jcc)
