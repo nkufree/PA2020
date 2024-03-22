@@ -20,12 +20,12 @@ typedef struct {
 
 static void itora(int num32, char* s, int* len, int base, bool is_unsigned)
 {
-  int64_t num = 0;
+  int64_t num;
   bool minus = num32 < 0 && !is_unsigned;
   if(minus)
     num = -num32;
   else
-    num = (uint32_t)num;
+    num = (uint32_t)num32;
   if(num == 0)
   {
     s[0] = '0';
