@@ -111,7 +111,11 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
     envc++;
   }
 //   Log("argc: %d, envc: %d\n", argc, envc);
-  void* ret = new_page(4);
+  void* ret = new_page(8);
+  void* end = ret + 8 * PGSIZE;
+  for(int i = 0; i < 8; i++) {
+    map(&pcb->as, pcb->as.area.end - 1, end - i * PGSIZE, 0x7);
+  }
   ret -= argvlen + envplen + (argc + envc + 2) * sizeof(char*) + sizeof(int) + 12;
   *((int*)ret) = argc;
   char** argvp = ret + sizeof(int);
