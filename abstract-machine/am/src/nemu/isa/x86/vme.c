@@ -62,7 +62,7 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   PTE* cr3 = (PTE*)as->ptr;
   if (!(cr3[dir] & 0x1)) {
     cr3[dir] = (PTE)pgalloc_usr(PGSIZE) | 0x1;
-    printf("alloc new page table: %p\n", cr3[dir]);
+    printf("alloc new page table: [%p] = %p\n", cr3 + dir, cr3[dir]);
   }
   PTE* pdir = (PTE*)(cr3[dir] & ~0xfff);
   // printf("cr3: %p, dir: %p, pdir: %p\n", cr3, dir, pdir);
