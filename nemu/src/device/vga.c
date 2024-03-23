@@ -3,7 +3,7 @@
 #ifdef HAS_IOE
 
 #define SHOW_SCREEN
-//#define MODE_800x600
+// #define MODE_800x600
 
 #ifdef MODE_800x600
 # define SCREEN_W 800
@@ -19,7 +19,7 @@
 
 #define VMEM 0xa0000000
 
-#define VGACTL_PORT 0x100
+#define VGACTL_PORT 0x100 // Note that this is not the standard
 #define VGACTL_MMIO 0xa1000100
 
 static SDL_Renderer *renderer = NULL;
@@ -38,14 +38,14 @@ static inline void update_screen() {
 }
 
 void vga_update_screen() {
+  // TODO: call `update_screen()` when the sync register is non-zero,
+  // then zero out the sync register
   uint32_t sync = vgactl_port_base[1];
-  if(sync == 1)
+  if(sync != 0)
   {
     update_screen();
     vgactl_port_base[1] = 0;
   }
-  //TODO: call 'update_screen()' when the sync register is non-zero,
-  //then zero out the sync register
 }
 
 void init_vga() {
