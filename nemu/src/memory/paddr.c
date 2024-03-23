@@ -100,6 +100,7 @@ word_t vaddr_mmu_read(vaddr_t addr, int len, int type) {
   }
   else {
     printf("read error[%d], vaddr: %p, len: %d, type: %d, pc = 0x%x\n", pg_base, (void*)(uintptr_t)addr, len, type, cpu.pc);
+    isa_reg_display();
     assert(0);
   }
   return 0;
