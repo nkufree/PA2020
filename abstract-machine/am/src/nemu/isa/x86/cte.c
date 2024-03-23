@@ -27,6 +27,7 @@ Context* __am_irq_handle(Context *c) {
     switch (c->irq) {
       case EX_SYSCALL: ev.event = EVENT_SYSCALL; break;
       case EX_YIELD: ev.event = EVENT_YIELD; break;
+      case T_IRQ0: ev.event = EVENT_IRQ_TIMER; break;
       default: ev.event = EVENT_ERROR; break;
     }
 
@@ -67,7 +68,7 @@ Context* kcontext(Area kstack, void (*entry)(void *), void *arg) {
   Context* c = (Context*)(kstack.end - sizeof(Context) - sizeof(uintptr_t));
   memset(c, 0, sizeof(Context));
   c->cs = 8;
-  c->eflags = 0x2;
+  c->eflags = 0x202;
   c->eip = (uintptr_t)entry;
   c->ebp = (uintptr_t)kstack.end;
   c->esp = (uintptr_t)&c->eip;

@@ -36,7 +36,6 @@ int mm_brk(uintptr_t brk){
   }
   current->max_brk += pages * PGSIZE;
   return 0;
-
 }
 // int mm_brk(uintptr_t brk)
 // {

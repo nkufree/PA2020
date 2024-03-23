@@ -1,6 +1,8 @@
 #include <cpu/exec.h>
 #include "local-include/rtl.h"
 
+#define IRQ_TIMER 32 
+
 void raise_intr(DecodeExecState *s, word_t NO, vaddr_t ret_addr) {
   /* TODO: Trigger an interrupt/exception with ``NO''.
    * That is, use ``NO'' to index the IDT.
@@ -18,5 +20,9 @@ void raise_intr(DecodeExecState *s, word_t NO, vaddr_t ret_addr) {
 }
 
 void query_intr(DecodeExecState *s) {
-  TODO();
+  if (cpu.INTR && get_flag(F_IF)) {
+    cpu.INTR = 0;
+    raise_intr(s, IRQ_TIMER, cpu.pc);
+    update_pc(s);
+  }
 }
