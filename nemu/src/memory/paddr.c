@@ -110,7 +110,8 @@ void vaddr_mmu_write(vaddr_t addr, word_t data, int len) {
   uint32_t ss = 0x228d000 +(0xa0012000>>20);
   if(addr - len <= ss && addr + len > ss) {
     paddr_t pg_base = isa_mmu_translate(addr, data, len);
-    printf("write to %x, data = 0x%x, len = %d, ret: %d\n", addr, data, len, pg_base);
+    paddr_t paddr = page_table_walk(addr);
+    printf("write to %x, data = 0x%x, len = %d, ret: %d, paddr: %x\n", addr, data, len, pg_base, paddr);
   }
   paddr_t pg_base = isa_mmu_translate(addr, data, len);
   if(pg_base == MEM_RET_OK) {
