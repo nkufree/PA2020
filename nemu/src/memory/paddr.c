@@ -107,15 +107,10 @@ word_t vaddr_mmu_read(vaddr_t addr, int len, int type) {
 
 void vaddr_mmu_write(vaddr_t addr, word_t data, int len) {
   assert(len == 1 || len == 2 || len == 4);
-  uint32_t ss = 0x228d000 +(0xa0012000>>20);
-  if(addr - len <= ss && addr + len > ss) {
-    paddr_t pg_base = isa_mmu_translate(addr, data, len);
-    paddr_t paddr = page_table_walk(addr);
-    printf("write to %x, data = 0x%x, len = %d, ret: %d, paddr: %x\n", addr, data, len, pg_base, paddr);
-  }
   paddr_t pg_base = isa_mmu_translate(addr, data, len);
   if(pg_base == MEM_RET_OK) {
     paddr_t paddr = page_table_walk(addr);
+    Log("vaddr_mmu_write: vaddr = 0x%x, paddr = 0x%x, data = 0x%x, len = %d", addr, paddr, data, len);
     paddr_write(paddr, data, len);
   }
   else if(pg_base == MEM_RET_CROSS_PAGE) {
