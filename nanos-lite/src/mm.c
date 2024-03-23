@@ -1,13 +1,6 @@
 #include <memory.h>
 #include <proc.h>
 
-#define OFFSET 0xfff
-#define PGSIZE 4096
-#define page_begin_vaddr(A) ((void*)((uintptr_t)(A)&(~OFFSET)))
-#define page_end_vaddr(A) ((void*)(((uintptr_t)(A)&(~OFFSET))+PGSIZE))
-#define min(A,B) ((size_t)(A) < (size_t)(B)? (A):(B))
-#define vaddr_offset(A) ((uintptr_t)(A)&OFFSET)
-
 static void *pf = NULL;
 extern PCB *current;
 
