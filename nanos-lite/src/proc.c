@@ -62,7 +62,7 @@ void init_proc() {
 Context* schedule(Context *prev) {
   current->cp = prev;
 //   current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
-//   current = &pcb[1];
+  current = &pcb[1];
 //   if(current == &pcb_boot)
 //     Log("schedule: current = boot");
 //   else
