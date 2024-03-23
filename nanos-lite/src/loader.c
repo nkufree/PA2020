@@ -124,8 +124,8 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
   Area ustack = {start, end};
 //   printf("pcb->as.area.start: %p, pcb->as.area.end: %p\n", pcb->as.area.start, pcb->as.area.end);
   for(int i = 0; i < 8; i++) {
-    map(&pcb->as, pcb->as.area.end - i * PGSIZE, end - i * PGSIZE, 0x7);
-    printf("map vaddr: %p, paddr: %p\n", pcb->as.area.end - i * PGSIZE, end - i * PGSIZE);
+    map(&pcb->as, pcb->as.area.end - (i+1) * PGSIZE, end - (i+1) * PGSIZE, 0x7);
+    printf("map vaddr: %p, paddr: %p\n", pcb->as.area.end - (i+1) * PGSIZE, end - (i+1) * PGSIZE);
   }
   end -= argvlen + envplen + (argc + envc + 2) * sizeof(char*) + sizeof(int) + 12;
   *((int*)end) = argc;
