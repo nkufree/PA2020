@@ -27,14 +27,14 @@ int mm_brk(uintptr_t brk){
   if(current->max_brk >= brk) {
     return 0;
   }
-  // uintptr_t gap = brk - current->max_brk;
-  // size_t pages = (gap + PGSIZE - 1) / PGSIZE;
-  // void* paddr = new_page(pages);
-  // for(int i = 0; i < pages; i++) {
-  //   map(&current->as, (void*)(current->max_brk + i * PGSIZE), paddr + i * PGSIZE, 0);
-  //   Log("map vaddr: %p, paddr: %p", (void*)(current->max_brk + i * PGSIZE), paddr + i * PGSIZE);
-  // }
-  // current->max_brk += pages * PGSIZE;
+  uintptr_t gap = brk - current->max_brk;
+  size_t pages = (gap + PGSIZE - 1) / PGSIZE;
+  void* paddr = new_page(pages);
+  for(int i = 0; i < pages; i++) {
+    map(&current->as, (void*)(current->max_brk + i * PGSIZE), paddr + i * PGSIZE, 0);
+    Log("map vaddr: %p, paddr: %p", (void*)(current->max_brk + i * PGSIZE), paddr + i * PGSIZE);
+  }
+  current->max_brk += pages * PGSIZE;
   return 0;
 
 }
