@@ -45,17 +45,17 @@ int execve(const char *filename, char *const argv[], char *const envp[]) {
 
 void init_proc() {
   Log("Initializing processes...");
-  context_kload(&pcb[0], hello_fun, NULL);
+//   context_kload(&pcb[0], hello_fun, NULL);
   Log("Init hello_fun OK");
-  char* argv[] = {"/bin/nterm", NULL};
+//   char* argv[] = {"/bin/nterm", NULL};
 //   char* argv[] = {"/bin/pal","--skip", NULL};
-  context_uload(&pcb[1], "/bin/nterm", argv, NULL);
+//   context_uload(&pcb[1], "/bin/nterm", argv, NULL);
   Log("Init user thread OK");
   switch_boot_pcb();
 
 
   // load program here
-//   naive_uload(NULL, "/bin/busybox");
+  naive_uload(&pcb[0], "/bin/pal");
 
 }
 
