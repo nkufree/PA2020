@@ -68,6 +68,7 @@ static int cmd_info(char* args) {
   }
   return 0;
 }
+word_t vaddr_read(vaddr_t addr, int len);
 
 static int cmd_x(char* args) {
   int num;
@@ -83,7 +84,7 @@ static int cmd_x(char* args) {
   for(int i = 0; i < (num << 2); i+=4) 
   {
     printf("0x%08x ", addr + i);
-    word_t tmp = paddr_read(addr + i, 4);
+    word_t tmp = vaddr_read(addr + i, 4);
     uint8_t* addr_tmp = (uint8_t*)&tmp;
     for(int j = 0; j < 4; j++)
     {
