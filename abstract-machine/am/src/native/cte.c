@@ -25,6 +25,7 @@ static void irq_handle(Context *c) {
 
   c = user_handler(thiscpu->ev, c);
   assert(c != NULL);
+
   __am_switch(c);
 
   // magic call to restore context
