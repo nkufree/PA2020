@@ -63,9 +63,9 @@ Context* schedule(Context *prev) {
   current->cp = prev;
   current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
   // current = &pcb[1];
-//   if(current == &pcb_boot)
-//     Log("schedule: current = boot");
-//   else
-//     Log("schedule: current = %d", current == &pcb[0] ? 0 : 1);
+  if(current == &pcb_boot)
+    Log("schedule: current = boot");
+  else
+    Log("schedule: current = %d", current == &pcb[0] ? 0 : 1);
   return current->cp;
 }
