@@ -118,7 +118,7 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
   }
 //   Log("argc: %d, envc: %d\n", argc, envc);
   protect(&pcb->as);
-  memset(pcb->as.ptr + (((uint32_t)pcb->as.area.start) >> 22), 0, (uint32_t)(pcb->as.area.end - pcb->as.area.start) >> 22);
+  memset(pcb->as.ptr + (((uint32_t)pcb->as.area.start) >> 20), 0, (uint32_t)(pcb->as.area.end - pcb->as.area.start) >> 20);
   void* ret = new_page(8);
   void* end = ret + 8 * PGSIZE;
   printf("pcb->as.area.start: %p, pcb->as.area.end: %p\n", pcb->as.area.start, pcb->as.area.end);
