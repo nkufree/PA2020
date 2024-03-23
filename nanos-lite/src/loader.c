@@ -151,5 +151,5 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
   Log("entry = %p", entry);
   pcb->cp = ucontext(&pcb->as, (Area) { pcb->stack, pcb->stack + STACK_SIZE }, (void*)entry);
   pcb->cp->GPRx = (uintptr_t)(pcb->as.area.end - (ustack.end - end));
-  Log("stack top: %p, stack bottom: %p", pcb->cp->GPRx, pcb->cp->ebp);
+  Log("stack top: %p", pcb->cp->GPRx);
 }
