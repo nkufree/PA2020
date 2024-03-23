@@ -119,7 +119,7 @@ void vaddr_mmu_write(vaddr_t addr, word_t data, int len) {
   }
   else {
     printf("write error[%d], vaddr: %p, data: %x, len: %d, pc = 0x%x\n", pg_base, (void*)(uintptr_t)addr, data, len, cpu.pc);
-    // assert(0);
+    assert(0);
   }
   return;
 }
