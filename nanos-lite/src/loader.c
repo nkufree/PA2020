@@ -89,7 +89,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       build_size += len;
     }
     // memset((void*)start, 0, ph->p_memsz - ph->p_filesz);
-    pcb->max_brk = (uintptr_t)start;
+    pcb->max_brk = (uintptr_t)start % PGSIZE == 0 ? (uintptr_t)start : (uintptr_t)start + PGSIZE - (uintptr_t)start % PGSIZE;
   }
   fs_close(fd);
 
