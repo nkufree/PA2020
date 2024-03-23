@@ -38,9 +38,9 @@ void *malloc(size_t size) {
   size = (size_t)ROUNDUP(size, 8);
   addr=addr+size;
   assert((uintptr_t)heap.start <= (uintptr_t)addr && (uintptr_t)addr < (uintptr_t)heap.end);
-  for (char *p = (char *)ret; p != (char *)addr; p ++) {
-    *p = 0;
-  }
+//   for (char *p = (char *)ret; p != (char *)addr; p ++) {
+//     *p = 0;
+//   }
   return ret;
 }
 
