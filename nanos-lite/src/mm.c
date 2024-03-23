@@ -32,7 +32,6 @@ void free_page(void *p) {
 int mm_brk(uintptr_t brk){
   Log("max_brk: %p, brk: %p",current->max_brk, brk);
   if(current->max_brk >= brk) {
-    current->max_brk = brk;
     return 0;
   }
   uintptr_t gap = brk - current->max_brk;
@@ -42,6 +41,7 @@ int mm_brk(uintptr_t brk){
     map(&current->as, (void*)(current->max_brk + i * PGSIZE), paddr + i * PGSIZE, 0);
     Log("map vaddr: %p, paddr: %p", (void*)(current->max_brk + i * PGSIZE), paddr + i * PGSIZE);
   }
+  current->max_brk += pages * PGSIZE;
   return 0;
 
 }
