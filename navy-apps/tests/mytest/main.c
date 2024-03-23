@@ -2,7 +2,8 @@
 #include <stdlib.h>
 
 void print_argv(char* v) {
-    printf("%s\n", v);
+    write(1, v, strlen(v));
+    write(1, "\n", 1);
 }
 
 int main(int      argc,
