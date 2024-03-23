@@ -45,24 +45,24 @@ int execve(const char *filename, char *const argv[], char *const envp[]) {
 
 void init_proc() {
   Log("Initializing processes...");
-  context_kload(&pcb[0], hello_fun, NULL);
+  // context_kload(&pcb[0], hello_fun, NULL);
   Log("Init hello_fun OK");
-  char* argv[] = {"/bin/nterm", NULL};
+  // char* argv[] = {"/bin/nterm", NULL};
   // char* argv[] = {"/bin/pal","--skip", NULL};
-  context_uload(&pcb[1], "/bin/nterm", argv, NULL);
+  // context_uload(&pcb[1], "/bin/pal", argv, NULL);
   Log("Init user thread OK");
   switch_boot_pcb();
 
 
   // load program here
-//   naive_uload(&pcb[0], "/bin/pal");
+  naive_uload(&pcb[0], "/bin/pal");
 
 }
 
 Context* schedule(Context *prev) {
   current->cp = prev;
-  current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
-  // current = &pcb[1];
+  // current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  current = &pcb[1];
 //   if(current == &pcb_boot)
 //     Log("schedule: current = boot");
 //   else
