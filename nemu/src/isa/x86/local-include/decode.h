@@ -38,7 +38,7 @@ static inline def_DopHelper(I) {
   /* pc here is pointing to the immediate */
   word_t imm = instr_fetch(&s->seq_pc, op->width);
   operand_imm(s, op, load_val, imm, op->width);
-}
+}//取出立即数,这里op= s->dest
 
 /* I386 manual does not contain this abbreviation, but it is different from
  * the one above from the view of implementation. So we use another helper
@@ -47,20 +47,29 @@ static inline def_DopHelper(I) {
 /* sign immediate */
 static inline def_DopHelper(SI) {
   assert(op->width == 1 || op->width == 4);
-
+  word_t imm = instr_fetch(&s->seq_pc, op->width);
+  rtl_sext(s,&imm,&imm,op->width);
+  operand_imm(s, op, load_val, imm, op->width);
+  
   /* TODO: Use instr_fetch() to read `op->width' bytes of memory
    * pointed by 's->seq_pc'. Interpret the result as a signed immediate,
    * and call `operand_imm()` as following.
    *
-   operand_imm(s, op, load_val, ???, op->width);
+  operand_imm(s, op, load_val, ???, op->width);
+  
    */
-  sword_t imm = instr_fetch(&s->seq_pc, op->width);
-  if(op->width == 1)
-  {
-    imm = (int8_t)imm;
-  }
-  operand_imm(s, op, load_val, imm, op->width);
-}
+}//可能有问题的地方 !!!!
+
+
+
+
+//!!!!
+
+/*
+t0, t1, ... - 只能在RTL伪指令的实现过程中存放中间结果
+s0, s1, ... - 只能在译码辅助函数和执行辅助函数的实现过程中存放中间结果
+*/
+
 
 /* I386 manual does not contain this abbreviation.
  * It is convenient to merge them into a single helper function.
@@ -90,7 +99,7 @@ static inline def_DopHelper(r) {
  */
 static inline void operand_rm(DecodeExecState *s, Operand *rm, bool load_rm_val, Operand *reg, bool load_reg_val) {
   read_ModR_M(s, rm, load_rm_val, reg, load_reg_val);
-}
+}//取出r/m中的数据
 
 /* Ob, Ov */
 static inline def_DopHelper(O) {
@@ -101,7 +110,6 @@ static inline def_DopHelper(O) {
     rtl_lm(s, &op->val, s->isa.mbase, s->isa.moff, op->width);
     op->preg = &op->val;
   }
-
   print_Dop(op->str, OP_STR_SIZE, "0x%x", s->isa.moff);
 }
 
@@ -178,6 +186,7 @@ static inline def_DHelper(I) {
   decode_op_I(s, id_dest, true);
 }
 
+
 static inline def_DHelper(r) {
   decode_op_r(s, id_dest, true);
 }
@@ -228,7 +237,7 @@ static inline def_DHelper(gp2_cl2E) {
   operand_rm(s, id_dest, true, NULL, false);
   // shift instructions will eventually use the lower
   // 5 bits of %cl, therefore it is OK to load %ecx
-  operand_reg(s, id_src1, true, R_ECX, 4);
+  operand_reg(s, id_src1, true, R_CL, 1);
 }
 
 static inline def_DHelper(gp2_Ib2E) {
@@ -251,7 +260,7 @@ static inline def_DHelper(cl_G2E) {
   operand_rm(s, id_dest, true, id_src2, true);
   // shift instructions will eventually use the lower
   // 5 bits of %cl, therefore it is OK to load %ecx
-  operand_reg(s, id_src1, true, R_ECX, 4);
+  operand_reg(s, id_src1, true, R_ECX, 1);
 }
 
 static inline def_DHelper(O2a) {
@@ -296,36 +305,10 @@ static inline def_DHelper(out_a2dx) {
   operand_reg(s, id_dest, true, R_DX, 2);
 }
 
-static inline def_DHelper(call_SI) {
-  decode_J(s);
-}
-
-static inline def_DHelper(none) {
-
-}
-
-static inline def_DHelper(xchg) {
-  decode_op_r(s, id_src1, true);
-  operand_reg(s, id_dest, true, R_EAX, 4);
-}
-
-static inline def_DHelper(leave) {
-  if(id_dest->width == 2)
-  {
-    operand_reg(s, id_src1, true, R_BP, 2);
-    operand_reg(s, id_dest, false, R_SP, 2);
-  }
-  else if(id_dest->width == 4)
-  {
-    operand_reg(s, id_src1, true, R_EBP, 4);
-    operand_reg(s, id_dest, false, R_ESP, 4);
-  }
-  else
-    assert(0);
-}
-
 static inline void operand_write(DecodeExecState *s, Operand *op, rtlreg_t* src) {
   if (op->type == OP_TYPE_REG) { rtl_sr(s, op->reg, src, op->width); }
   else if (op->type == OP_TYPE_MEM) { rtl_sm(s, s->isa.mbase, s->isa.moff, src, op->width); }
   else { assert(0); }
-}
+}//根据第二个参数的类型来将数据写入内存或者寄存器
+
+
