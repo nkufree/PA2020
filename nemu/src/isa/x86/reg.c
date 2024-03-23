@@ -64,6 +64,7 @@ void isa_reg_display() {
     printf("%s = %d ", eflagsn[i], get_flag(eflagsi[i]));
   }
   printf("\n");
+  printf("cr3 = 0x%08x\n", cpu.cr3);
   printf("pc = 0x%08x\n", cpu.pc);
 }
 
