@@ -102,53 +102,118 @@ void naive_uload(PCB *pcb, const char *filename) {
   ((void(*)())entry) ();
 }
 
-void context_uload(PCB* pcb, const char *filename, char *const argv[], char *const envp[]) {
-  // 解析参数和环境变量
-  int argc = 0, envc = 0;
-  int argvlen = 0, envplen = 0;
-  while(argv != NULL && argv[argc] != NULL)
+// void context_uload(PCB* pcb, const char *filename, char *const argv[], char *const envp[]) {
+//   // 解析参数和环境变量
+//   int argc = 0, envc = 0;
+//   int argvlen = 0, envplen = 0;
+//   while(argv != NULL && argv[argc] != NULL)
+//   {
+//     argvlen += strlen(argv[argc]) + 1;
+//     argc++;
+//   }
+//   while(envp != NULL && envp[envc] != NULL)
+//   {
+//     envplen += strlen(envp[envc]) + 1;
+//     envc++;
+//   }
+// //   Log("argc: %d, envc: %d\n", argc, envc);
+//   protect(&pcb->as);
+// //   memset(pcb->as.ptr + (((uint32_t)pcb->as.area.start) >> 20), 0, (uint32_t)(pcb->as.area.end - pcb->as.area.start) >> 20);
+//   void* start = new_page(8);
+//   void* end = start + 8 * PGSIZE;
+//   Area ustack = {start, end};
+// //   printf("pcb->as.area.start: %p, pcb->as.area.end: %p\n", pcb->as.area.start, pcb->as.area.end);
+//   for(int i = 0; i < 8; i++) {
+//     map(&pcb->as, pcb->as.area.end - i * PGSIZE, end - i * PGSIZE, 0x7);
+//     // printf("map vaddr: %p, paddr: %p\n", pcb->as.area.end - i * PGSIZE, end - i * PGSIZE);
+//   }
+//   end -= argvlen + envplen + (argc + envc + 2) * sizeof(char*) + sizeof(int) + 12;
+//   *((int*)end) = argc;
+//   char** argvp = end + sizeof(int);
+//   char* string_area = end + sizeof(int) + (argc + envc + 2) * sizeof(char*);
+// //   Log("ret: %p, argvp: %p, string_area: %p\n", ret, argvp, string_area);
+//   for(int i = 0; i < argc; i++)
+//   {
+//     strcpy(string_area, argv[i]);
+//     *argvp = string_area;
+//     argvp++;
+//     string_area += strlen(argv[i]) + 1;
+//   }
+//   argvp++;
+//   for(int i = 0; i < envc; i++)
+//   {
+//     strcpy(string_area, envp[i]);
+//     *argvp = string_area;
+//     argvp++;
+//     string_area += strlen(envp[i]) + 1;
+//   }
+//   uintptr_t entry = loader(pcb, filename);
+//   Log("entry = %p", entry);
+//   pcb->cp = ucontext(&pcb->as, (Area) { pcb->stack, pcb->stack + STACK_SIZE }, (void*)entry);
+//   pcb->cp->GPRx = (uintptr_t)(pcb->as.area.end - (ustack.end - end));
+// }
+
+#define PGSIZE 4096
+#define stack_num 8
+#define OFFSET 0xfff
+#define page_begin_vaddr(A) ((void*)((uintptr_t)(A)&(~OFFSET)))
+#define page_end_vaddr(A) ((void*)(((uintptr_t)(A)&(~OFFSET))+PGSIZE))
+#define paddr_offset(A,B) ((void*)(((uintptr_t)(A)&(OFFSET))|(uintptr_t)(((uintptr_t)(B)>>12)<<12)))
+#define min(A,B) ((uintptr_t)(A) < (uintptr_t)(B)? (A):(B))
+
+void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[])
+{
+  protect(&pcb->as);
+  void *start = new_page(stack_num);
+  void *end = start + stack_num * PGSIZE;
+  for (int i = 1; i <= stack_num; i++)
   {
-    argvlen += strlen(argv[argc]) + 1;
+    map(&pcb->as, pcb->as.area.end - i * PGSIZE, end - i * PGSIZE, 0x7);
+  }
+  Area ustack = {start, end};
+
+  uintptr_t entry = loader(pcb, filename);
+
+  int size = 0, size_argv = 0, size_envp = 0, argc = 0, envc = 0;
+  while (argv[argc] != NULL)
+  {
+    size_argv += strlen(argv[argc]) + 1;
     argc++;
   }
-  while(envp != NULL && envp[envc] != NULL)
+  while (envp[envc] != NULL)
   {
-    envplen += strlen(envp[envc]) + 1;
+    size_envp += strlen(envp[envc]) + 1;
     envc++;
   }
-//   Log("argc: %d, envc: %d\n", argc, envc);
-  protect(&pcb->as);
-//   memset(pcb->as.ptr + (((uint32_t)pcb->as.area.start) >> 20), 0, (uint32_t)(pcb->as.area.end - pcb->as.area.start) >> 20);
-  void* start = new_page(8);
-  void* end = start + 8 * PGSIZE;
-  Area ustack = {start, end};
-//   printf("pcb->as.area.start: %p, pcb->as.area.end: %p\n", pcb->as.area.start, pcb->as.area.end);
-  for(int i = 0; i < 8; i++) {
-    map(&pcb->as, pcb->as.area.end - i * PGSIZE, end - i * PGSIZE, 0x7);
-    // printf("map vaddr: %p, paddr: %p\n", pcb->as.area.end - i * PGSIZE, end - i * PGSIZE);
-  }
-  end -= argvlen + envplen + (argc + envc + 2) * sizeof(char*) + sizeof(int) + 12;
-  *((int*)end) = argc;
-  char** argvp = end + sizeof(int);
-  char* string_area = end + sizeof(int) + (argc + envc + 2) * sizeof(char*);
-//   Log("ret: %p, argvp: %p, string_area: %p\n", ret, argvp, string_area);
-  for(int i = 0; i < argc; i++)
+  size = size_envp + size_argv + sizeof(uintptr_t) * (argc + 4 + envc);
+  size = size - size % sizeof(uintptr_t);
+  void *ret = pcb->as.area.end - size;
+  void *args_start = ustack.end - size;
+  void *str_start = args_start + sizeof(uintptr_t) * (argc + 3 + envc);
+
+  memset(args_start, 0, ustack.end - args_start);
+  *(uintptr_t *)args_start = argc;
+  for (int i = 0; i < argc; i++)
   {
-    strcpy(string_area, argv[i]);
-    *argvp = string_area;
-    argvp++;
-    string_area += strlen(argv[i]) + 1;
+    memcpy(str_start, argv[i], strlen(argv[i]));
+    *(uintptr_t *)(args_start + sizeof(uintptr_t) * (i + 1)) = (uintptr_t)str_start;
+    str_start += strlen(argv[i]) + 1;
   }
-  argvp++;
-  for(int i = 0; i < envc; i++)
+  *(uintptr_t *)(args_start + sizeof(uintptr_t) * (1 + argc)) = 0;
+  for (int i = 0; i < envc; i++)
   {
-    strcpy(string_area, envp[i]);
-    *argvp = string_area;
-    argvp++;
-    string_area += strlen(envp[i]) + 1;
+    memcpy(str_start, envp[i], strlen(envp[i]));
+    *(uintptr_t *)(args_start + sizeof(uintptr_t) * (argc + 2 + i)) = (uintptr_t)str_start;
+    str_start += strlen(envp[i]) + 1;
   }
-  uintptr_t entry = loader(pcb, filename);
-  Log("entry = %p", entry);
-  pcb->cp = ucontext(&pcb->as, (Area) { pcb->stack, pcb->stack + STACK_SIZE }, (void*)entry);
-  pcb->cp->GPRx = (uintptr_t)(pcb->as.area.end - (ustack.end - end));
+  *(uintptr_t *)(args_start + sizeof(uintptr_t) * (argc + 2 + envc)) = 0;
+
+  Area stack = {pcb->stack, pcb->stack + STACK_SIZE};
+  pcb->cp = ucontext(&pcb->as, stack, (void *)entry);
+  pcb->cp->GPRx = (uintptr_t)ret;
+  /* uintptr_t entry = loader(pcb, filename);
+  Area stack = {pcb->stack,pcb->stack + STACK_SIZE};
+  pcb->cp = ucontext(&pcb->as,stack,(void*)entry);
+  pcb->cp->GPRx = (uintptr_t)heap.end; */
+  //while (1);
 }
