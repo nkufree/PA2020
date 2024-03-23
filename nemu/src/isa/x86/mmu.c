@@ -7,6 +7,7 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int type, int len) {
   uint32_t offset = (uint32_t)vaddr & 0xfff;
   uint32_t pde = paddr_read((cpu.cr3 & 0xfffff000) | (dir << 2), 4);
   if((pde & 0x1) == 0) {
+    isa_mmu_translate(0x40000000, 0, 4);
     Log("cr3: %x, vaddr: %x, pde = %x",cpu.cr3, vaddr, pde);
     return MEM_RET_FAIL;
   }
