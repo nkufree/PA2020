@@ -110,7 +110,7 @@ void vaddr_mmu_write(vaddr_t addr, word_t data, int len) {
   paddr_t pg_base = isa_mmu_translate(addr, data, len);
   if(pg_base == MEM_RET_OK) {
     paddr_t paddr = page_table_walk(addr);
-    if(addr >= 0x228d000 && addr <= 0x228e000)
+    if(addr >= 0x228d000 && addr <= 0x228d800)
     Log("vaddr_mmu_write: vaddr = 0x%x, paddr = 0x%x, data = 0x%x, len = %d", addr, paddr, data, len);
     paddr_write(paddr, data, len);
   }
