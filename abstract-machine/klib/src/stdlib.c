@@ -31,6 +31,7 @@ int atoi(const char* nptr) {
 }
 
 void *malloc(size_t size) {
+    printf("malloc: %d\n", size);
   if(addr == NULL)
     addr = (void *)ROUNDUP(heap.start, 8);
   char* ret = addr;
