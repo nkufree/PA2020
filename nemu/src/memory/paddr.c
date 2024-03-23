@@ -82,9 +82,8 @@ word_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len) {
 
 void vaddr_write_cross_page(vaddr_t vaddr ,word_t data,int len) {
   Log("vaddr_write_cross_page: vaddr = 0x%x, data = 0x%x, len = %d", vaddr, data, len);
-  paddr_t paddr = page_table_walk(vaddr);
   for(int i = 0; i < len; i++) {
-    paddr_write(paddr + i, (data >> (i * 8)) & 0xff, 1);
+    paddr_write(page_table_walk(vaddr + i), (data >> (i * 8)) & 0xff, 1);
   }
   return;
 }
