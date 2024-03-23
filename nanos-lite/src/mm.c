@@ -39,6 +39,7 @@ int mm_brk(uintptr_t brk){
   void* paddr = new_page(pages);
   for(int i = 0; i < pages; i++) {
     map(&current->as, (void*)(current->max_brk + i * PGSIZE), paddr + i * PGSIZE, 0);
+    Log("map vaddr: %p, paddr: %p", (void*)(current->max_brk + i * PGSIZE), paddr + i * PGSIZE);
   }
   return 0;
 
