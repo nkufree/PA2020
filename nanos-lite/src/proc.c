@@ -49,7 +49,7 @@ void init_proc() {
   Log("Init hello_fun OK");
   char* argv[] = {"/bin/nterm", NULL};
 //   char* argv[] = {"/bin/pal","--skip", NULL};
-  context_uload(&pcb[1], "/bin/hello", argv, NULL);
+  context_uload(&pcb[1], "/bin/mytest", argv, NULL);
   Log("Init user thread OK");
   switch_boot_pcb();
 
