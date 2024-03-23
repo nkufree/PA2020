@@ -119,17 +119,18 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
 //   Log("argc: %d, envc: %d\n", argc, envc);
   protect(&pcb->as);
 //   memset(pcb->as.ptr + (((uint32_t)pcb->as.area.start) >> 20), 0, (uint32_t)(pcb->as.area.end - pcb->as.area.start) >> 20);
-  void* ret = new_page(8);
-  void* end = ret + 8 * PGSIZE;
+  void* start = new_page(8);
+  void* end = start + 8 * PGSIZE;
+  Area ustack = {start, end};
 //   printf("pcb->as.area.start: %p, pcb->as.area.end: %p\n", pcb->as.area.start, pcb->as.area.end);
   for(int i = 0; i < 8; i++) {
     map(&pcb->as, pcb->as.area.end - i * PGSIZE, end - i * PGSIZE, 0x7);
     // printf("map vaddr: %p, paddr: %p\n", pcb->as.area.end - i * PGSIZE, end - i * PGSIZE);
   }
-  ret -= argvlen + envplen + (argc + envc + 2) * sizeof(char*) + sizeof(int) + 12;
-  *((int*)ret) = argc;
-  char** argvp = ret + sizeof(int);
-  char* string_area = ret + sizeof(int) + (argc + envc + 2) * sizeof(char*);
+  end -= argvlen + envplen + (argc + envc + 2) * sizeof(char*) + sizeof(int) + 12;
+  *((int*)end) = argc;
+  char** argvp = end + sizeof(int);
+  char* string_area = end + sizeof(int) + (argc + envc + 2) * sizeof(char*);
 //   Log("ret: %p, argvp: %p, string_area: %p\n", ret, argvp, string_area);
   for(int i = 0; i < argc; i++)
   {
@@ -149,5 +150,5 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
   uintptr_t entry = loader(pcb, filename);
   Log("entry = %p", entry);
   pcb->cp = ucontext(&pcb->as, (Area) { pcb->stack, pcb->stack + STACK_SIZE }, (void*)entry);
-  pcb->cp->GPRx = (uintptr_t)ret;
+  pcb->cp->GPRx = (uintptr_t)(pcb->as.area.end - (ustack.end - end));
 }
