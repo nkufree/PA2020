@@ -107,8 +107,8 @@ word_t vaddr_mmu_read(vaddr_t addr, int len, int type) {
 
 void vaddr_mmu_write(vaddr_t addr, word_t data, int len) {
   assert(len == 1 || len == 2 || len == 4);
-  if(addr - len <= 0x400053b2 && addr + len >= 0x400053b2)
-    Log("vaddr_mmu_write: vaddr = 0x%x, data = 0x%x, len = %d", addr, data, len);
+//   if(addr - len <= 0x400053b2 && addr + len >= 0x400053b2)
+//     Log("vaddr_mmu_write: vaddr = 0x%x, data = 0x%x, len = %d", addr, data, len);
   paddr_t pg_base = isa_mmu_translate(addr, data, len);
   if(pg_base == MEM_RET_OK) {
     paddr_t paddr = page_table_walk(addr);
