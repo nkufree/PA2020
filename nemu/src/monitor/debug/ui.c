@@ -6,6 +6,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <memory/paddr.h>
+#include <memory/vaddr.h>
 #include "monitor/monitor.h"
 
 void cpu_exec(uint64_t);
@@ -68,7 +69,6 @@ static int cmd_info(char* args) {
   }
   return 0;
 }
-word_t vaddr_read(vaddr_t addr, int len);
 
 static int cmd_x(char* args) {
   int num;
