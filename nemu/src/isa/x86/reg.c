@@ -2,13 +2,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include "local-include/reg.h"
-#include <stdio.h>
 
 const char *regsl[] = {"eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"};
 const char *regsw[] = {"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"};
 const char *regsb[] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
-const char *eflagsn[] = {"CF", "ZF", "SF", "IF", "OF"};
-const int eflagsi[] = { F_CF, F_ZF, F_SF, F_IF, F_OF};
 
 void reg_test() {
   srand(time(0));
@@ -45,62 +42,24 @@ void reg_test() {
 }
 
 void isa_reg_display() {
-  for(int i = 0; i < 8; i++)
-  {
-    printf("%s = 0x%08x\t", regsl[i], cpu.gpr[i]._32);
-    printf("%s = 0x%04x\t", regsw[i], cpu.gpr[i]._16);
-    if(i < 4)
-    {
-      printf("%s = 0x%02x\t", regsb[i], cpu.gpr[i]._8[0]);
-      printf("%s = 0x%02x\n", regsb[i + 4], cpu.gpr[i]._8[1]);
-    }
-    else
-    {
-      printf("\n");
-    }
-  }
-  for(int i = 0; i < 5; i++)
-  {
-    printf("%s = %d ", eflagsn[i], get_flag(eflagsi[i]));
-  }
-  printf("\n");
-  printf("cr3 = 0x%08x\n", cpu.cr3);
-  printf("pc = 0x%08x\n", cpu.pc);
+  printf("eax=0x%x\n",cpu.eax);
+  printf("edx=0x%x\n",cpu.edx);
+  printf("ecx=0x%x\n",cpu.ecx);
+  printf("ebx=0x%x\n",cpu.ebx);
+  printf("ebp=0x%x\n",cpu.ebp);
+  printf("esi=0x%x\n",cpu.esi);
+  printf("edi=0x%x\n",cpu.edi);
+  printf("esp=0x%x\n",cpu.esp);
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
-  int shift = 0;
-	if(s[0] == '$')
-		shift = 1;
-  if(strcmp(s + shift, "pc") == 0)
-	{
-		*success = true;
-		return cpu.pc;
-	}
-  for(int i = 0; i < 8; i++)
-	{
-		if(strcmp(regsl[i], s + shift) == 0)
-		{
-			*success = true;
-			return cpu.gpr[i]._32;
-		}
-	}
-  for(int i = 0; i < 8; i++)
-	{
-		if(strcmp(regsw[i], s + shift) == 0)
-		{
-			*success = true;
-			return cpu.gpr[i]._16;
-		}
-	}
-  for(int i = 0; i < 8; i++)
-	{
-		if(strcmp(regsb[i], s + shift) == 0)
-		{
-			*success = true;
-			return cpu.gpr[i % 4]._8[i / 4];
-		}
-	}
-	*success = false;
-  return 0;
+    if(!strcmp(s,"$eax")) return cpu.eax;
+    if(!strcmp(s,"$edx")) return cpu.edx;
+    if(!strcmp(s,"$ecx")) return cpu.ecx;
+    if(!strcmp(s,"$ebx")) return cpu.ebx;
+    if(!strcmp(s,"$ebp")) return cpu.ebp;
+    if(!strcmp(s,"$esi")) return cpu.esi;
+    if(!strcmp(s,"$edi")) return cpu.edi;
+    if(!strcmp(s,"$esp")) return cpu.esp;
+    return 0;
 }

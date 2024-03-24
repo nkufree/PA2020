@@ -1,10 +1,78 @@
 #include "watchpoint.h"
 #include "expr.h"
+#include<malloc.h>
 
-#define NR_WP 32
+#define NR_WP 35
 
 static WP wp_pool[NR_WP] = {};
-static WP *head = NULL, *free_ = NULL;
+static WP *head = NULL, *free_ = NULL, *used =NULL;
+
+WP* new_wp(){
+  if(used==head)
+  {
+    used=free_;
+    used->prev=head;
+    return used;
+  }
+  else{
+    used->next=free_;
+    free_->prev=used;
+    used=used->next;
+    free_=free_->next;
+    return used;
+  }
+}
+
+void free_wp(WP *wp)
+{
+  if(wp==used)
+  {
+    free_->prev=used;
+    used->next=free_;
+    used=used->prev;
+  }
+  else{
+    if(wp->prev==head)
+    {
+      wp->next->prev=head;
+      wp->next=free_;
+      free_->prev=wp;
+      free_=free_->prev;
+      free(wp->exp);
+    }
+    else{
+      wp->prev->next=wp->next;
+      wp->next->prev=wp->prev;
+      wp->next=free_;
+      free_->prev=wp;
+      free_=free_->prev;
+      free(wp->exp);
+    }
+  }
+  
+  
+}//此处未考虑wp_pool使用完的情况，即认为free_ != NULL
+
+void display_wp_pool()
+{
+  WP* wp=used;
+  if(used==head)
+  {
+    printf("No watchpoint\n");
+  }
+  else{
+    while(wp != head)
+    {
+      printf("%d %s\n",wp->NO,wp->exp);
+      wp=wp->prev;
+    }
+  }
+}
+
+WP* all_wp()
+{
+  return used;
+}
 
 void init_wp_pool() {
   int i;
@@ -13,116 +81,15 @@ void init_wp_pool() {
     wp_pool[i].next = &wp_pool[i + 1];
   }
   wp_pool[NR_WP - 1].next = NULL;
-
+  for(i = 1;i < NR_WP;i ++)
+  {
+    wp_pool[i].prev=&wp_pool[i-1];
+  }
+  wp_pool[0].prev=head;
   head = NULL;
   free_ = wp_pool;
+  used=NULL;
 }
 
 /* TODO: Implement the functionality of watchpoint */
 
-WP* new_wp(char* expr)
-{
-	// 检查是否有空闲块
-	if(free_ == NULL)
-		assert(0);
-	// 将curr移动到链表末尾
-	WP* curr = head;
-	if(curr == NULL)
-	{
-		curr = free_;
-		free_ = free_->next;
-        head = curr;
-        head->next = NULL;
-		memcpy(head->expr, expr, strlen(expr) + 1);
-		return curr;
-	}
-  while (curr->next != NULL)
-	{
-		curr = curr->next;
-	}
-	curr->next = free_;
-	free_ = free_->next;
-    curr->next->next = NULL;
-	memcpy(curr->next->expr, expr, strlen(expr) + 1);
-	return curr->next;
-}
-
-// void free_wp(WP* wp)
-// {
-// 	WP* curr = head;
-// 	if(curr == NULL || wp == NULL)
-// 		return;
-// 	if(head == wp)
-// 	{
-// 		head = wp->next;
-// 		wp->next = free_;
-// 		free_ = wp->next;
-// 		return;
-// 	}
-// 	while(curr->next != NULL && curr->next != wp)
-// 	{
-// 		curr = curr->next;
-// 	}
-// 	if(curr->next == NULL)
-// 	{
-// 		Log("no such wp %p", wp);
-// 		assert(0);
-// 	}
-// 	curr->next = wp->next;
-// 	wp->next = free_;
-// 	free_ = wp;
-// 	return;
-// }
-
-void free_wp(int no)
-{
-	WP* curr = head;
-	if(curr == NULL || no >= NR_WP)
-		return;
-	if(head->NO == no)
-	{
-		WP* tmp = head;
-		head = tmp->next;
-		tmp->next = free_;
-		free_ = tmp->next;
-		return;
-	}
-	while(curr->next != NULL && curr->next->NO != no)
-	{
-		curr = curr->next;
-	}
-	if(curr->next == NULL)
-	{
-		Log("no such no %d", no);
-		assert(0);
-	}
-	WP* tmp = curr->next;
-	curr->next = tmp->next;
-	tmp->next = free_;
-	free_ = tmp;
-	return;
-}
-
-void print_wp()
-{
-	WP* curr = head;
-	while (curr != NULL)
-	{
-		printf("%d %s\n", curr->NO, curr->expr);
-		curr = curr->next;
-	}
-	return;
-}
-
-WP* check_wp()
-{
-  WP* curr = head;
-  while (curr != NULL)
-  {
-    bool success;
-    if(expr(curr->expr, &success))
-      return curr;
-    curr = curr->next;
-  }
-  return NULL;
-}
