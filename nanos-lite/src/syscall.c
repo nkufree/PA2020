@@ -11,7 +11,7 @@ int execve(const char *filename, char *const argv[], char *const envp[]);
 int mm_brk(uintptr_t brk);
 
 void do_syscall(Context *c) {
-  Log("syscall ID = %d\n", c->GPR1);
+//   Log("syscall ID = %d\n", c->GPR1);
   uintptr_t a[4];
   a[0] = c->GPR1;
   a[1] = c->GPR2;
