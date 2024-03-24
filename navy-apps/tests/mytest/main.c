@@ -14,7 +14,7 @@ void print_argv(char* v) {
 
 int main(int      argc,
    char    *argv[]) {
-  for(int i =0;i < 3; i++)
+  for(volatile int i =0;i < 3; i++)
 		print_test(i);
   write(1, "Hello World!1\n", 14);
   for(int i = 0; i < 10; i++)
