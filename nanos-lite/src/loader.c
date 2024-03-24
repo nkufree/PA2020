@@ -123,6 +123,7 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
   void* end = start + 8 * PGSIZE;
   Area ustack = {start, end};
 //   printf("pcb->as.area.start: %p, pcb->as.area.end: %p\n", pcb->as.area.start, pcb->as.area.end);
+  size_t offset = pcb->as.area.end - ustack.end;
   for(int i = 0; i < 8; i++) {
     map(&pcb->as, pcb->as.area.end - (i+1) * PGSIZE, end - (i+1) * PGSIZE, 0x7);
     printf("map cr3: %p, vaddr: %p, paddr: %p\n", pcb->as.ptr, pcb->as.area.end - (i+1) * PGSIZE, end - (i+1) * PGSIZE);
@@ -135,7 +136,7 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
   for(int i = 0; i < argc; i++)
   {
     strcpy(string_area, argv[i]);
-    *argvp = string_area;
+    *argvp = string_area + offset;
     argvp++;
     string_area += strlen(argv[i]) + 1;
   }
@@ -143,7 +144,7 @@ void context_uload(PCB* pcb, const char *filename, char *const argv[], char *con
   for(int i = 0; i < envc; i++)
   {
     strcpy(string_area, envp[i]);
-    *argvp = string_area;
+    *argvp = string_area + offset;
     argvp++;
     string_area += strlen(envp[i]) + 1;
   }
