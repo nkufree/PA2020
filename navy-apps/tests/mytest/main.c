@@ -1,16 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void print_test() {
+	int*a = (int*)malloc(10*sizeof(int));
+	write(1, "Hello World!0\n", 13);
+  for(int i = 0; i < 10; i++)
+    a[i] = i;
+}
+
 void print_argv(char* v) {
     printf("%s\n", v);
 }
 
 int main(int      argc,
    char    *argv[]) {
-  int*a = (int*)malloc(10*sizeof(int));
-	write(1, "Hello World!0\n", 13);
-  for(int i = 0; i < 10; i++)
-    a[i] = i;
+  print_test();
   write(1, "Hello World!1\n", 14);
   for(int i = 0; i < 10; i++)
     printf("%d\n", a[i]);
