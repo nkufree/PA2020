@@ -22,11 +22,42 @@ enum {
 
 static uint8_t *sbuf = NULL;
 static uint32_t *audio_base = NULL;
+static uint32_t tail;
+static SDL_AudioSpec s = {};
 
 static inline void audio_play(void *userdata, uint8_t *stream, int len) {
+	// printf("freq: %d, channels: %d, samples: %d\n", s.freq, s.channels, s.samples);
+	// printf("len: %d, audio_base[reg_count]: %d, head: %d\n", len, audio_base[reg_count], head);
+	int nread = len;
+	if (audio_base[reg_count] < len) nread = audio_base[reg_count];
+
+  if (nread + tail < STREAM_BUF_MAX_SIZE) {
+    memcpy(stream, sbuf + tail, nread);
+    tail += nread;
+  } else {
+    int first_cpy_len = STREAM_BUF_MAX_SIZE - tail;
+    memcpy(stream, sbuf + tail, first_cpy_len);
+    memcpy(stream + first_cpy_len, sbuf, nread - first_cpy_len);
+    tail = nread - first_cpy_len;
+  }
+  audio_base[reg_count] -= nread;
+	if (len > nread)
+		memset(stream + nread, 0, len - nread);
 }
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {
+	assert(len == 4);
+	if(!is_write)
+		return;
+  switch (offset) {
+    case 0:  s.freq = audio_base[reg_freq]; break;
+    case 4:  s.channels = audio_base[reg_channels]; break;
+    case 8:  s.samples = audio_base[reg_samples]; break;
+    default: break;
+  }
+	SDL_InitSubSystem(SDL_INIT_AUDIO);
+	SDL_OpenAudio(&s, NULL);
+	SDL_PauseAudio(0);
 }
 
 void init_audio() {
@@ -37,5 +68,10 @@ void init_audio() {
 
   sbuf = (void *)new_space(STREAM_BUF_MAX_SIZE);
   add_mmio_map("audio-sbuf", STREAM_BUF, (void *)sbuf, STREAM_BUF_MAX_SIZE, NULL);
+	audio_base[reg_sbuf_size] = STREAM_BUF_MAX_SIZE;
+	tail = 0;
+	s.format = AUDIO_S16SYS;  // 假设系统中音频数据的格式总是使用16位有符号数来表示
+	s.userdata = NULL;        // 不使用
+	s.callback = audio_play;
 }
 #endif	/* HAS_IOE */
