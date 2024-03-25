@@ -44,16 +44,18 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     size_t build_size = 0;
     void* last_page = NULL;
     size_t len = 0;
+    size_t offset = 0;
     while (build_size < ph->p_filesz)
     {
+      offset = (ph->p_offset + build_size) % PGSIZE;
       len = ph->p_filesz - build_size;
-      if (len > PGSIZE)
+      if (len + offset > PGSIZE)
       {
-        len = PGSIZE;
+        len = PGSIZE - offset;
       }
       last_page = new_page(1);
-      fs_read(fd, last_page, len);
-      Log("map vaddr: %p, len: %d, paddr: %p", start, len, last_page);
+      fs_read(fd, last_page + offset, len);
+      Log("map vaddr: %p, len: %d, paddr: %p", start, len, last_page + offset);
       map(&pcb->as, (void*)start, last_page, 0);
       start += len;
       build_size += len;
@@ -67,10 +69,10 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     start = ph->p_vaddr + ph->p_filesz;
     // 最后一页没填满，不需要分配新页，直接写入
     if(len < PGSIZE) {
-      size_t offset = len;
+      size_t shift = len;
       len = ph->p_memsz - build_size < PGSIZE - len ? ph->p_memsz - build_size : PGSIZE - len;
       Log("write vaddr: %p, len: %d, paddr: %p", start, len, last_page);
-      memset((void*)last_page+offset, 0, len);
+      memset((void*)last_page+shift, 0, len);
       start += len;
       build_size += len;
     }
