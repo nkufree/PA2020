@@ -50,6 +50,7 @@ void init_proc() {
   char* argv[] = {"/bin/nterm", NULL};
 //   char* argv[] = {"/bin/pal","--skip", NULL};
   context_uload(&pcb[1], "/bin/nterm", argv, NULL);
+  context_uload(&pcb[2], "/bin/hello", argv, NULL);
   Log("Init user thread OK");
   switch_boot_pcb();
 
@@ -61,7 +62,8 @@ void init_proc() {
 
 Context* schedule(Context *prev) {
   current->cp = prev;
-  current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  current = (current == &pcb[0] ? &pcb[1] :
+            current == &pcb[1] ? &pcb[2] : &pcb[0]);
   if(current != &pcb_boot && current->cp->cr3 == pcb_boot.cp->cr3)
     current->cp->cr3 = NULL;
 //   current = &pcb[1];
