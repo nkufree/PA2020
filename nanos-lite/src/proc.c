@@ -4,6 +4,7 @@
 #define MAX_NR_PROC 4
 
 static PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
+static int nr_pcb = 0;
 static PCB pcb_boot = {};
 PCB *current = NULL;
 
@@ -51,6 +52,13 @@ void init_proc() {
 //   char* argv[] = {"/bin/pal","--skip", NULL};
   context_uload(&pcb[1], "/bin/hello", argv, NULL);
   context_uload(&pcb[2], "/bin/nterm", argv, NULL);
+  pcb[0].priority = 1;
+  pcb[1].priority = 1;
+  pcb[2].priority = 100;
+  pcb[0].time_slice = 1;
+  pcb[1].time_slice = 1;
+  pcb[2].time_slice = 100;
+  nr_pcb = 3;
   Log("Init user thread OK");
   switch_boot_pcb();
 
@@ -62,8 +70,21 @@ void init_proc() {
 
 Context* schedule(Context *prev) {
   current->cp = prev;
-  current = (current == &pcb[0] ? &pcb[1] :
-            current == &pcb[1] ? &pcb[2] : &pcb[0]);
+  // current = (current == &pcb[0] ? &pcb[1] :
+  //           current == &pcb[1] ? &pcb[2] : &pcb[0]);
+  if(current->time_slice != 0) {
+    current->time_slice --;
+  }
+  else {
+    current->time_slice = current->priority;
+    int index;
+    for (index = 0; index < nr_pcb; index++)
+    {
+      if(current == &pcb[index])
+        break;
+    }
+    current = &pcb[(index + 1) % nr_pcb];
+  }
   if(current != &pcb_boot && current->cp->cr3 == pcb_boot.cp->cr3)
     current->cp->cr3 = NULL;
 //   current = &pcb[1];
