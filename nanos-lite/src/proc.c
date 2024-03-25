@@ -50,8 +50,8 @@ void init_proc() {
   context_kload(&pcb[0], hello_fun, NULL);
   Log("Init hello_fun OK");
   char* argv[] = {"/bin/nterm", NULL};
-//   char* argv[] = {"/bin/pal","--skip", NULL};
-  context_uload(&pcb[1], "/bin/hello", argv, NULL);
+  char* pal_argv[] = {"/bin/pal","--skip", NULL};
+  context_uload(&pcb[1], "/bin/pal", pal_argv, NULL);
   context_uload(&pcb[2], "/bin/nterm", argv, NULL);
   pcb[0].priority = 1;
   pcb[1].priority = 1;
@@ -60,7 +60,7 @@ void init_proc() {
   pcb[1].time_slice = 1;
   pcb[2].time_slice = 100;
   nr_pcb = 3;
-  fg_pcb = 0;
+  fg_pcb = 2;
   Log("Init user thread OK");
   switch_boot_pcb();
 
