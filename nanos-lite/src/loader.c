@@ -53,7 +53,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       }
       last_page = new_page(1);
       fs_read(fd, last_page, len);
-    //   Log("map vaddr: %p, len: %d, paddr: %p", start, len, last_page);
+      Log("map vaddr: %p, len: %d, paddr: %p", start, len, last_page);
       map(&pcb->as, (void*)start, last_page, 0);
       start += len;
       build_size += len;
@@ -69,7 +69,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     if(len < PGSIZE) {
       size_t offset = len;
       len = ph->p_memsz - build_size < PGSIZE - len ? ph->p_memsz - build_size : PGSIZE - len;
-    //   Log("write vaddr: %p, len: %d, paddr: %p", start, len, last_page);
+      Log("write vaddr: %p, len: %d, paddr: %p", start, len, last_page);
       memset((void*)last_page+offset, 0, len);
       start += len;
       build_size += len;
@@ -83,7 +83,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       }
       last_page = new_page(1);
       memset(last_page, 0, len);
-    //   Log("map bss vaddr: %p, len: %d, paddr: %p", start, len, last_page);
+      Log("map bss vaddr: %p, len: %d, paddr: %p", start, len, last_page);
       map(&pcb->as, (void*)start, last_page, 0);
       start += len;
       build_size += len;
