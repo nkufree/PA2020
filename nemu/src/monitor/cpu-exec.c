@@ -86,10 +86,10 @@ void cpu_exec(uint64_t n) {
 
     g_nr_guest_instr ++;
 
-    if(cpu.pc == 0x400307d4) {
-      printf("Stop at pc: 0x%08x\n", cpu.pc);
-      nemu_state.state = NEMU_STOP;
-    }
+    // if(cpu.pc == 0x400307d4) {
+    //   printf("Stop at pc: 0x%08x\n", cpu.pc);
+    //   nemu_state.state = NEMU_STOP;
+    // }
 
 #ifdef DEBUG
     asm_print(this_pc, seq_pc - this_pc, n < MAX_INSTR_TO_PRINT);
