@@ -81,6 +81,7 @@ static inline def_EHelper(iret) {
       cpu.esp = *s1;
     }
   rtl_j(s,*s0);
+  set_flag(F_IF);
   print_asm("iret");
 
 #ifndef __DIFF_REF_NEMU__
