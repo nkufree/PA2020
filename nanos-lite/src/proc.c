@@ -49,8 +49,8 @@ void init_proc() {
   Log("Init hello_fun OK");
   char* argv[] = {"/bin/nterm", NULL};
 //   char* argv[] = {"/bin/pal","--skip", NULL};
-  context_uload(&pcb[1], "/bin/nterm", argv, NULL);
-  context_uload(&pcb[2], "/bin/hello", argv, NULL);
+  context_uload(&pcb[1], "/bin/hellp", argv, NULL);
+  context_uload(&pcb[2], "/bin/nterm", argv, NULL);
   Log("Init user thread OK");
   switch_boot_pcb();
 
@@ -70,10 +70,10 @@ Context* schedule(Context *prev) {
   if(current == &pcb_boot)
     Log("schedule: current = boot");
   else if(current == &pcb[0])
-    Log("schedule: current = hello_fun");
+    Log("schedule: current = 0");
   else if(current == &pcb[1])
-    Log("schedule: current = nterm");
+    Log("schedule: current = 1");
   else if(current == &pcb[2])
-    Log("schedule: current = hello");
+    Log("schedule: current = 2");
   return current->cp;
 }
