@@ -88,10 +88,19 @@ static inline def_EHelper(gp5) {
   }
 }
 
+static inline def_EHelper(gp6) {
+  switch (s->isa.ext_opcode) {
+    EMPTY(0) EMPTY(1) EMPTY(2)
+    EXW(3, ltr, 2)
+    EMPTY(4) EMPTY(5) EMPTY(6) EMPTY(7)
+  }
+}
+
 /* 0x0f 0x01*/
 static inline def_EHelper(gp7) {
   switch (s->isa.ext_opcode) {
-    EMPTY(0) EMPTY(1) EMPTY(2)
+    EMPTY(0) EMPTY(1)
+    GPEXEC(2, lgdt)
     GPEXEC(3, lidt)
     EMPTY(4) EMPTY(5) EMPTY(6) EMPTY(7)
   }
@@ -102,6 +111,7 @@ static inline def_EHelper(2byte_esc) {
   s->opcode = opcode;
   switch (opcode) {
   /* TODO: Add more instructions!!! */
+    IDEX (0x00, gp7_E, gp6)
     IDEX (0x01, gp7_E, gp7)
     IDEX (0x20, G2E, mov_cr2r)
     IDEX (0x22, E2G, mov_r2cr)

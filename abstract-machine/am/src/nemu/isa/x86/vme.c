@@ -78,7 +78,8 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
 Context* ucontext(AddrSpace *as, Area kstack, void *entry) {
   Context* c = (Context*)(kstack.end - sizeof(Context));
   memset(c, 0, sizeof(Context));
-  c->cs = 8;
+  c->cs = USEL(3);
+  c->ss3 = USEL(4);
   c->cr3 = as->ptr;
   c->eflags = 0x202;
   c->eip = (uintptr_t)entry;

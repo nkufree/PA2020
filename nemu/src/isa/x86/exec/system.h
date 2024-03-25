@@ -16,6 +16,19 @@ static inline def_EHelper(lidt) {
   print_asm_template1(lidt);
 }
 
+static inline def_EHelper(ltr) {
+  cpu.tr = *ddest;
+  print_asm_template1(ltr);
+}
+
+static inline def_EHelper(lgdt) {
+  cpu.gdtr.limit = (*ddest)>>16;
+  cpu.gdtr.base = vaddr_read(*(s->isa.mbase) + s->isa.moff + 2, 4);
+  if(id_dest->width == 2)
+    cpu.gdtr.base &= 0x00ffffff;
+  print_asm_template1(lgdt);
+}
+
 static inline def_EHelper(mov_r2cr) {
   switch(id_dest->reg) {
     case 0:
@@ -57,6 +70,16 @@ static inline def_EHelper(iret) {
   rtl_pop(s, s0);
   rtl_pop(s, &(cpu.cs));
   rtl_pop(s, &(cpu.eflags));
+  if((cpu.cs&0x3) == 3) {
+      uint32_t gdt_addr = cpu.gdtr.base + cpu.tr;
+      uint32_t base = vaddr_read(gdt_addr+2,2) 
+                  | (vaddr_read(gdt_addr+4,1)<<16) 
+                  | (vaddr_read(gdt_addr+7,1)<<24);
+      rtl_pop(s,s1);
+      rtl_pop(s,&cpu.ss);
+      vaddr_write(base + 4,cpu.esp,4);
+      cpu.esp = *s1;
+    }
   rtl_j(s,*s0);
   print_asm("iret");
 

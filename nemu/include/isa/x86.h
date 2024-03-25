@@ -57,6 +57,12 @@ typedef struct {
   uint32_t cr0;
   uint32_t cr3;
   bool INTR;
+  struct {
+    uint32_t base;
+    uint16_t limit;
+  } gdtr;
+  uint32_t tr;
+  uint32_t ss;
 } x86_CPU_state;
 
 // decode

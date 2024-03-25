@@ -68,7 +68,7 @@ inline void paddr_write(paddr_t addr, word_t data, int len) {
 paddr_t page_table_walk(vaddr_t vaddr);
 
 word_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len) {
-  Log("vaddr_read_cross_page: vaddr = 0x%x, type = %d, len = %d", vaddr, type, len);
+//   Log("vaddr_read_cross_page: vaddr = 0x%x, type = %d, len = %d", vaddr, type, len);
   paddr_t paddr = page_table_walk(vaddr);
   uint32_t offset = vaddr & 0xfff;
   uint32_t len1 = PAGE_SIZE - offset;
@@ -81,7 +81,7 @@ word_t vaddr_read_cross_page(vaddr_t vaddr ,int type,int len) {
 }
 
 void vaddr_write_cross_page(vaddr_t vaddr ,word_t data,int len) {
-  Log("vaddr_write_cross_page: vaddr = 0x%x, data = 0x%x, len = %d", vaddr, data, len);
+//   Log("vaddr_write_cross_page: vaddr = 0x%x, data = 0x%x, len = %d", vaddr, data, len);
   for(int i = 0; i < len; i++) {
     paddr_write(page_table_walk(vaddr + i), (data >> (i * 8)) & 0xff, 1);
   }
@@ -118,7 +118,6 @@ void vaddr_mmu_write(vaddr_t addr, word_t data, int len) {
     paddr_write(paddr, data, len);
   }
   else if(pg_base == MEM_RET_CROSS_PAGE) {
-    Log("cross page write: vaddr = 0x%x, data = 0x%x, len = %d", addr, data, len);
     vaddr_write_cross_page(addr, data, len);
   }
   else {

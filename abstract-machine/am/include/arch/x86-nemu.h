@@ -7,6 +7,7 @@ struct Context {
 //   uintptr_t esi, ebx, eax, eip, edx, eflags, ecx, cs, esp, edi, ebp;
   int irq;
   uintptr_t eip, cs, eflags;
+  uintptr_t esp3, ss3;
 };
 
 #define GPR1 eax
