@@ -77,7 +77,7 @@ static inline def_EHelper(iret) {
                   | (vaddr_read(gdt_addr+7,1)<<24);
       rtl_pop(s,s1);
       rtl_pop(s,&cpu.ss);
-      vaddr_write(base + 4,cpu.esp,4);
+      vaddr_write(base + 4, cpu.esp, 4);
       cpu.esp = *s1;
     }
   rtl_j(s,*s0);
