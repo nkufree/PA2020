@@ -51,16 +51,19 @@ void init_proc() {
   Log("Init hello_fun OK");
   char* argv[] = {"/bin/nterm", NULL};
   char* pal_argv[] = {"/bin/pal","--skip", NULL};
-  context_uload(&pcb[1], "/bin/pal", pal_argv, NULL);
-  context_uload(&pcb[2], "/bin/nterm", argv, NULL);
+  context_uload(&pcb[1], "/bin/nterm", argv, NULL);
+  context_uload(&pcb[2], "/bin/pal", pal_argv, NULL);
+  context_uload(&pcb[3], "/bin/bird", argv, NULL);
   pcb[0].priority = 1;
   pcb[1].priority = 1;
-  pcb[2].priority = 100;
+  pcb[2].priority = 10;
+  pcb[3].priority = 10;
   pcb[0].time_slice = 1;
   pcb[1].time_slice = 1;
-  pcb[2].time_slice = 100;
-  nr_pcb = 3;
-  fg_pcb = 2;
+  pcb[2].time_slice = 10;
+  pcb[3].time_slice = 10;
+  nr_pcb = 4;
+  fg_pcb = 1;
   Log("Init user thread OK");
   switch_boot_pcb();
 
