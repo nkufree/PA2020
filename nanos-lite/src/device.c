@@ -14,6 +14,8 @@ static const char *keyname[256] __attribute__((used)) = {
   AM_KEYS(NAME)
 };
 
+extern int fg_pcb;
+
 size_t serial_write(const void *buf, size_t offset, size_t len) {
 //   yield();
   for(int i = 0; i < len; i++)
@@ -27,6 +29,18 @@ size_t events_read(void *buf, size_t offset, size_t len) {
 //   yield();
   AM_INPUT_KEYBRD_T ev = io_read(AM_INPUT_KEYBRD);
   if (ev.keycode == AM_KEY_NONE) return 0;
+  if(ev.keycode == AM_KEY_F1 && ev.keydown)
+  {
+    fg_pcb = 1;
+  }
+  if(ev.keycode == AM_KEY_F2 && ev.keydown)
+  {
+    fg_pcb = 2;
+  }
+  if(ev.keycode == AM_KEY_F3 && ev.keydown)
+  {
+    fg_pcb = 3;
+  }
   sprintf(buf, "%s %s\0", ev.keydown ? "kd" : "ku", keyname[ev.keycode]);
 //   printf("%s %s\n",ev.keydown ? "kd" : "ku", keyname[ev.keycode]);
   return strlen((char*)buf);

@@ -71,15 +71,15 @@ static inline def_EHelper(iret) {
   rtl_pop(s, &(cpu.cs));
   rtl_pop(s, &(cpu.eflags));
   if((cpu.cs&0x3) == 3) {
-      uint32_t gdt_addr = cpu.gdtr.base + cpu.tr;
-      uint32_t base = vaddr_read(gdt_addr+2,2) 
-                  | (vaddr_read(gdt_addr+4,1)<<16) 
-                  | (vaddr_read(gdt_addr+7,1)<<24);
-      rtl_pop(s,s1);
-      rtl_pop(s,&cpu.ss);
-      vaddr_write(base + 4, cpu.esp, 4);
-      cpu.esp = *s1;
-    }
+    uint32_t gdt_addr = cpu.gdtr.base + cpu.tr;
+    uint32_t base = vaddr_read(gdt_addr+2,2) 
+                | (vaddr_read(gdt_addr+4,1)<<16) 
+                | (vaddr_read(gdt_addr+7,1)<<24);
+    rtl_pop(s,s1);
+    rtl_pop(s,&cpu.ss);
+    vaddr_write(base + 4, cpu.esp, 4);
+    cpu.esp = *s1;
+  }
   rtl_j(s,*s0);
   set_flag(F_IF);
   print_asm("iret");

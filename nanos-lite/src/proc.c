@@ -5,6 +5,7 @@
 
 static PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
 static int nr_pcb = 0;
+int fg_pcb = -1;
 static PCB pcb_boot = {};
 PCB *current = NULL;
 
@@ -59,6 +60,7 @@ void init_proc() {
   pcb[1].time_slice = 1;
   pcb[2].time_slice = 100;
   nr_pcb = 3;
+  fg_pcb = 0;
   Log("Init user thread OK");
   switch_boot_pcb();
 
@@ -77,13 +79,15 @@ Context* schedule(Context *prev) {
   }
   else {
     current->time_slice = current->priority;
-    int index;
-    for (index = 0; index < nr_pcb; index++)
-    {
-      if(current == &pcb[index])
-        break;
-    }
-    current = &pcb[(index + 1) % nr_pcb];
+    current = current == &pcb[0] ? &pcb[fg_pcb] : &pcb[0];
+    // current->time_slice = current->priority;
+    // int index;
+    // for (index = 0; index < nr_pcb; index++)
+    // {
+    //   if(current == &pcb[index])
+    //     break;
+    // }
+    // current = &pcb[(index + 1) % nr_pcb];
   }
   if(current != &pcb_boot && current->cp->cr3 == pcb_boot.cp->cr3)
     current->cp->cr3 = NULL;
