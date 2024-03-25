@@ -71,7 +71,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     if(len < PGSIZE) {
       size_t shift = len;
       len = ph->p_memsz - build_size < PGSIZE - len ? ph->p_memsz - build_size : PGSIZE - len;
-      Log("write vaddr: %p, len: %d, paddr: %p", start, len, last_page);
+      Log("write vaddr: %p, len: %d, paddr: %p", start, len, last_page + shift);
       memset((void*)last_page+shift, 0, len);
       start += len;
       build_size += len;
