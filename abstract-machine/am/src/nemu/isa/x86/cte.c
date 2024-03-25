@@ -35,8 +35,7 @@ Context* __am_irq_handle(Context *c) {
     assert(c != NULL);
   }
 //   printf("cr3 = %p pc = %x\n",c->cr3,c->eip);
-  if(c->cr3 != NULL)
-    __am_switch(c);
+  __am_switch(c);
   return c;
 }
 
