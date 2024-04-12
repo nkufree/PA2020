@@ -99,3 +99,12 @@ static inline def_EHelper(xchg) {
   operand_write(s, id_src1, s0);
   print_asm_template2(xchg);
 }
+
+static inline def_EHelper(movsb) {
+  *s0 = reg_l(R_ESI);
+  rtl_lm(s, s0, s0, 0, 1);
+  rtl_sm(s, &reg_l(R_EDI), 0, s0, 1);
+  reg_l(R_ESI) += 1;
+  reg_l(R_EDI) += 1;
+  print_asm_template2(movsb);
+}
