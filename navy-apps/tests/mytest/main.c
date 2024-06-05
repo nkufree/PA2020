@@ -17,12 +17,9 @@ int main(int      argc,
   for(volatile int i =0;i < 3; i++)
 		print_test(i);
   write(1, "Hello World!1\n", 14);
-  for(int i = 0; i < 10; i++)
-    printf("%d\n", a[i]);
 	write(1, "Hello World!2\n", 14);
   for(int i = 0; i < argc; i++)
     print_argv(argv[i]);
-  a[1] = 1;
   write(1, "Hello World!3\n", 14);
   return 0;
 }
